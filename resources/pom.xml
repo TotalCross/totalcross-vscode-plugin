@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <groupId>${'groupid'}</groupId>
+    <artifactId>${'artifactid'}</artifactId>
+    <version>1.0-SNAPSHOT</version>
+    <name>${'artifactid'}</name>
+
+    <properties>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <totalcross.activation_key>5443444B3018A93884C5D622</totalcross.activation_key>
+    </properties>
+
+    <dependencies>
+        <dependency>
+            <groupId>com.totalcross</groupId>
+            <artifactId>totalcross-sdk</artifactId>
+            <version>${'version'}</version>
+        </dependency>
+    </dependencies>
+
+    <repositories>
+        <repository>
+            <id>totalcross-repo</id>
+            <name>ip-172-31-40-140-releases</name>
+            <url>http://maven.totalcross.com/artifactory/repo1</url>
+        </repository>
+    </repositories>
+
+    <pluginRepositories>
+        <pluginRepository>
+            <id>totalcross-repo</id>
+            <name>ip-172-31-40-140-releases</name>
+            <url>http://maven.totalcross.com/artifactory/repo1</url>
+        </pluginRepository>
+    </pluginRepositories>
+
+    <build>
+        <finalName>${project.artifactId}</finalName>
+        <plugins>
+            <plugin>
+                <groupId>com.totalcross</groupId>
+                <artifactId>totalcross-maven-plugin</artifactId>
+                <version>1.0</version>
+                <configuration>
+                    <name>${project.name}</name>
+                    <platforms>
+                        ${'platforms'}
+                    </platforms>
+                    <activationKey>${totalcross.activation_key}</activationKey>
+                    <!--                    For version 4.4.2 and 5.1.4 or later, Apple certificates are no longer required. -->
+                    <!--                    <certificates>${totalcross.applecertificate}</certificates>-->
+<!--                    <totalcrossHome>/Users/italo/TotalCross5</totalcrossHome>-->
+                </configuration>
+                <executions>
+                    <execution>
+                        <id>post-package</id>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>package</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
+    </build>
+</project>
