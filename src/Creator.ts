@@ -38,7 +38,7 @@ exports.createNewProject = async function(context: vscode.ExtensionContext) {
     if(!platforms) {return;}
     
     let props = {artifactID, groupID, platforms, version};
-    let path = file[0].path.toString();
+    let path = file[0].fsPath.toString();
     let packagePath = path + '/src/main/java/' + groupID.replace(/\./g, "/");
     
     // Creates dir
@@ -50,7 +50,7 @@ exports.createNewProject = async function(context: vscode.ExtensionContext) {
     setupFile(context.extensionPath + '/resources/Sample.java', `${packagePath}/${artifactID}.java`, props);
     setupFile(context.extensionPath + '/resources/TestSampleApplication.java',
      `${packagePath}/Run${artifactID}Application.java`, props);
-    let uri = vscode.Uri.parse(file[0].path);
+    let uri = vscode.Uri.parse(file[0].fsPath);
     vscode.commands.executeCommand('vscode.openFolder', uri);
 };
 
