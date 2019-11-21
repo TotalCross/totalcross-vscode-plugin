@@ -9,6 +9,7 @@ var folder: any;
 var username: any;
 var host: any;
 var pom: any;
+var password: any;
 exports.deploy = async function() {
     return new Promise(async function (resolve){
         let workspaceFolders = vscode.workspace.workspaceFolders;
@@ -46,6 +47,16 @@ exports.deploy = async function() {
     }
     if(!host) {resolve(false); return;}
 
+    // ask password
+    if(!password) {
+        password = await vscode.window.showInputBox({
+            prompt: 'host password',
+            value: password === undefined ? undefined : password,
+            validateInput: validators.user
+        });
+    }
+    if(!password) {resolve(false); return;}
+
     // ask app folder
     // ask user
     if(!folder) {
@@ -60,6 +71,7 @@ exports.deploy = async function() {
     let options = {
         username,
         host,
+        password,
         port: 22,
         tryKeyboard: true,
         onKeyboardInteractive: (name: any, instructions: any, instructionsLang: any, prompts: any, finish: any) => {

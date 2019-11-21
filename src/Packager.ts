@@ -4,9 +4,10 @@ exports.package = async function () {
     return new Promise((resolve, reject) => {
         // Display a message box to the user
         var exec = require('child_process').exec, child;
-        var folder = vscode.workspace.rootPath;
-        if(process.platform == 'win32')
-            folder = '/d ' + folder
+        var folder =vscode.workspace.rootPath;
+        if(process.platform === 'win32') {
+            folder = "/d " + folder;
+        }
         var output = vscode.window.createOutputChannel("TotalCross Deploy");
         output.appendLine("Starting Deploy...");
         output.show();
