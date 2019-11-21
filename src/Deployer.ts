@@ -51,12 +51,10 @@ exports.deploy = async function() {
     if(!password) {
         password = await vscode.window.showInputBox({
             prompt: 'host password',
-            value: password === undefined ? undefined : password,
-            validateInput: validators.user
+            value: password === undefined ? undefined : password
         });
+        console.log(password);
     }
-    if(!password) {resolve(false); return;}
-
     // ask app folder
     // ask user
     if(!folder) {
@@ -94,8 +92,8 @@ exports.deploy = async function() {
                     }
                 })
                 .catch(function(err: any) {
-                    resolve(false);
                     vscode.window.showErrorMessage(err.message);
+                    resolve(false);
                 });
         })
         .catch(function (err: any) {
@@ -118,7 +116,7 @@ exports.deployAndRun = async function() {
         let output = vscode.window.createOutputChannel('TotalCross Deploy and Run');
         output.show();
         ssh.execCommand(
-            `cd ${folder} && export DISPLAY=:0 && chmod +x ${pom.project.name} && nohup ./${pom.project.name}`, {
+            `cd ${folder} && export DISPLAY=:0 && chmod +x ${pom.project.name} && ./${pom.project.name}`, {
             // ssh.execCommand(`cd /home/root/blah && export DISPLAY=:0 && nohup ./BlahApp`, {
             onStdout(chunk: any) {
                 output.appendLine(chunk.toString('utf8'));

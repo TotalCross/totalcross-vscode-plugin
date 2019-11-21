@@ -50,7 +50,7 @@ exports.createNewProject = async function(context: vscode.ExtensionContext) {
     setupFile(context.extensionPath + '/resources/Sample.java', `${packagePath}/${artifactID}.java`, props);
     setupFile(context.extensionPath + '/resources/TestSampleApplication.java',
      `${packagePath}/Run${artifactID}Application.java`, props);
-    let uri = vscode.Uri.parse(file[0].fsPath);
+    let uri = file[0];
     vscode.commands.executeCommand('vscode.openFolder', uri);
 };
 
