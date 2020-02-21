@@ -5,7 +5,7 @@
 	"version": "0.0.2",
 	"publisher": "Italo",
 	"preview": true,
-	"icon": "icon.png",	
+	"icon": "icon.png",
 	"engines": {
 		"vscode": "^1.40.0"
 	},
@@ -68,6 +68,7 @@
 		"pom-parser": "^1.1.1",
 		"replace-in-file": "^4.2.0",
 		"request": "^2.88.0",
+		"totalcross-core-dev": "0.0.0",
 		"xml-js": "^1.6.11"
 	}
 }
