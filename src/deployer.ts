@@ -2,7 +2,7 @@ import * as vscode from 'vscode';
 var node_ssh = require('node-ssh');
 var validators = require('./validators/deployer');
 const pomParser = require('pom-parser');
-const Packager = require('./Packager');
+const Packager = require('./packager');
 
 var ssh = new node_ssh();
 var folder: any;

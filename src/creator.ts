@@ -1,5 +1,9 @@
 import * as vscode from 'vscode';
+import {showInputBox} from './components/components';
 import { pathToFileURL } from 'url';
+import { LoginHandler } from './login';
+import { RegisterHandler } from './register';
+const core = require('totalcross-core-dev');
 const validators = require('./validators/creator');
 const fs = require('fs-extra');
 const request = require('request');
@@ -14,7 +18,30 @@ const options: vscode.OpenDialogOptions = {
 };
 
 exports.createNewProject = async function(context: vscode.ExtensionContext) {
-    let file = await vscode.window.showOpenDialog(options);
+    let auth = null;
+    let status = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Right, 100); 
+    status.text = `$(sync~spin) TotalCross Checking login credentials...`;
+    status.show();
+    try {
+        auth = await core.auth();
+    }
+    catch(exp) {
+        auth = false;
+    }
+    status.hide();
+    if(!auth) {
+        let res = await vscode.window.showErrorMessage('You must login your account in to create a new project', 'Login', 'New Account');
+        if(res) {
+            if(res === 'Login') {
+                new LoginHandler().showLoginPanel();
+            }
+            else {
+                new RegisterHandler().doRegister();
+            }
+        }
+        return;
+    }
+   let file = await vscode.window.showOpenDialog(options);
     if(file === undefined) {return;}
     
     // Get Project Information
@@ -31,25 +58,24 @@ exports.createNewProject = async function(context: vscode.ExtensionContext) {
         validators.artifactId
         );
     if(!artifactID) {return;}
-    let availableVersions = await getAvailableVersions(`${context.extensionPath}/resources/maven-metadata.xml`);
+    let availableVersions = await core.versions(`${context.extensionPath}/resources/maven-metadata.xml`);
     let version = await vscode.window.showQuickPick(availableVersions, {
-        placeHolder: 'totalcross sdk version'
+        placeHolder: 'totalcross sdk version',
+        ignoreFocusOut: true
+
     });
     if(!version) {return;}
     let platforms = await vscode.window.showQuickPick (
         ["-android", "-ios", "-linux", "-linux_arm", "-win32", "-wince"],
         {
             canPickMany: true,
-            placeHolder: 'example: -linux_arm'
+            placeHolder: 'example: -linux_arm',
+            ignoreFocusOut: true
         }
     );
     if(!platforms) {return;}
-
-    let activationKey = await showInputBox(
-        'Enter your TotalCross Activation key (24 characters)',
-        '000000000000000000000000',
-         validators.activationKey
-         );
+    
+    let activationKey = "5443444B5AAEEB90306B00E4";
     if(!activationKey) {return;}
     
     let props = {artifactID, groupID, platforms, version, activationKey};
@@ -69,15 +95,7 @@ exports.createNewProject = async function(context: vscode.ExtensionContext) {
     vscode.commands.executeCommand('vscode.openFolder', uri);
 };
 
-function showInputBox(prompt: string, placeHolder: string, validator: any) {
-    const options: vscode.InputBoxOptions = {
-        prompt: prompt,
-        valueSelection: [0, 10],
-        placeHolder: placeHolder,
-        validateInput: validator
-    };
-    return vscode.window.showInputBox(options);
-}
+
 
 
 
