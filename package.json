@@ -78,7 +78,7 @@
 		"pom-parser": "^1.1.1",
 		"replace-in-file": "^4.2.0",
 		"request": "^2.88.0",
-		"totalcross-core-dev": "0.0.8",
+		"totalcross-core-dev": "0.0.13",
 		"xml-js": "^1.6.11"
 	}
 }

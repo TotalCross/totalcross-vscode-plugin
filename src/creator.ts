@@ -58,7 +58,7 @@ exports.createNewProject = async function(context: vscode.ExtensionContext) {
         validators.artifactId
         );
     if(!artifactID) {return;}
-    let availableVersions = await core.versions(`${context.extensionPath}/resources/maven-metadata.xml`);
+    let availableVersions = await core.latestVersions(`${context.extensionPath}/resources/maven-metadata.xml`);
     let version = await vscode.window.showQuickPick(availableVersions, {
         placeHolder: 'totalcross sdk version',
         ignoreFocusOut: true
