@@ -77,7 +77,8 @@
 		"node-ssh": "^6.0.0",
 		"pom-parser": "^1.1.1",
 		"replace-in-file": "^4.2.0",
-		"request": "^2.88.0",
+		"request": "^2.88.2",
+		"request-promise": "^4.2.5",
 		"totalcross-core-dev": "0.0.13",
 		"xml-js": "^1.6.11"
 	}

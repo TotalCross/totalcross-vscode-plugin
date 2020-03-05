@@ -3,6 +3,7 @@ var node_ssh = require('node-ssh');
 var validators = require('./validators/deployer');
 const pomParser = require('pom-parser');
 const Packager = require('./packager');
+import {addToHistory} from './util'; 
 
 var ssh = new node_ssh();
 var folder: any;
@@ -89,6 +90,7 @@ exports.deploy = async function() {
                     resolve(status);
                     if(status) {
                         vscode.window.showInformationMessage('TotalCross Application succesfully deployed.');
+                        addToHistory('deploy');
                     }
                 })
                 .catch(function(err: any) {

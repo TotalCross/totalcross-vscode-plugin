@@ -1,8 +1,9 @@
 import * as vscode from 'vscode';
-
+import {addToHistory} from './util'; 
 exports.package = async function () {
     return new Promise((resolve, reject) => {
         // Display a message box to the user
+        addToHistory('package');
         var exec = require('child_process').exec, child;
         let workspaceFolders = vscode.workspace.workspaceFolders;
         if(!workspaceFolders) {
