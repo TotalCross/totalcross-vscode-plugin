@@ -26,8 +26,6 @@ exports.deploy = async function() {
             resolve2(response.pomObject);
         });
     });
-
-    await Packager.package();
     // ask user
     if(!username) {
         username = await vscode.window.showInputBox({
