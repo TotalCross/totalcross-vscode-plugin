@@ -2,7 +2,7 @@
 	"name": "totalcross",
 	"displayName": "TotalCross Project Extension",
 	"description": "This is TotalCross plugin extension for vs code. ",
-	"version": "0.0.3",
+	"version": "0.0.4",
 	"publisher": "Italo",
 	"preview": true,
 	"icon": "icon.png",
@@ -77,8 +77,9 @@
 		"node-ssh": "^6.0.0",
 		"pom-parser": "^1.1.1",
 		"replace-in-file": "^4.2.0",
-		"request": "^2.88.0",
-		"totalcross-core-dev": "0.0.8",
+		"request": "^2.88.2",
+		"request-promise": "^4.2.5",
+		"totalcross-core-dev": "0.0.13",
 		"xml-js": "^1.6.11"
 	}
 }
