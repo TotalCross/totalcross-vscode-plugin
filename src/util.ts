@@ -1,8 +1,13 @@
 const fs = require('fs-extra');
 const homedir = require('os').homedir();
 const request = require('request-promise');
-const token = require(`${homedir}/TotalCross/.config.json`).token;
-
+var token :string = 'NULL';
+try {
+    token = require(`${homedir}/TotalCross/.config.json`).token;
+}
+catch(e) {
+    // Do nothing
+}
 export async function addToHistory(activity: string) {
         console.log('token: ' + token);
         request({
