@@ -367,14 +367,11 @@ export class RegisterHandler {
             })
             .then((response: any) => {
                 vscode.window.showInformationMessage("TotalCross: you have successfully registered a new account.");
-                return {
-                    error: false,
-                    message: response
-                };
+                return response;
             })
             .catch((error: any) => {
                 vscode.window
-                .showErrorMessage(`TotalCross: ${error}`);
+                .showErrorMessage(`TotalCross: ${error.message}`);
                 return {
                     error: true,
                     message: error
