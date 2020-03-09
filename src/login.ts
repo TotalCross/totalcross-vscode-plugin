@@ -49,12 +49,8 @@ export class LoginHandler {
                 };
             })
             .catch((error: any) => {
-                vscode.window
-                .showErrorMessage("TotalCross: something got wrong, verify your credentials and try again");
-                return {
-                    error: true,
-                    message: error
-                };
+                vscode.window.showInformationMessage(error.message);
+                return error;
             })
             .then(() => myStatusBarItem.hide());
         });
