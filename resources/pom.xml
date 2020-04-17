@@ -53,7 +53,7 @@
             <plugin>
                 <groupId>com.totalcross</groupId>
                 <artifactId>totalcross-maven-plugin</artifactId>
-                <version>1.0</version>
+                <version>1.1</version>
                 <configuration>
                     <name>${project.name}</name>
                     <platforms>
@@ -65,6 +65,13 @@
 <!--                    <totalcrossHome>/Users/italo/TotalCross5</totalcrossHome>-->
                 </configuration>
                 <executions>
+                    <execution>
+                        <id>post-compile</id>
+                        <phase>compile</phase>
+                        <goals>
+                            <goal>retrolambda</goal>
+                        </goals>
+                    </execution>
                     <execution>
                         <id>post-package</id>
                         <phase>package</phase>
