@@ -1,8 +1,6 @@
 import * as vscode from 'vscode';
 import {showInputBox} from './components/components';
 import { pathToFileURL } from 'url';
-import { LoginHandler } from './login';
-import { RegisterHandler } from './register';
 const core = require('totalcross-core-dev');
 const validators = require('./validators/creator');
 const fs = require('fs-extra');
@@ -18,29 +16,7 @@ const options: vscode.OpenDialogOptions = {
 };
 
 exports.createNewProject = async function(context: vscode.ExtensionContext) {
-    let auth = null;
-    let status = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Right, 100); 
-    status.text = `$(sync~spin) TotalCross Checking login credentials...`;
-    status.show();
-    try {
-        auth = await core.auth();
-    }
-    catch(exp) {
-        auth = false;
-    }
-    status.hide();
-    if(!auth) {
-        let res = await vscode.window.showErrorMessage('You must login your account in to create a new project', 'Login', 'New Account');
-        if(res) {
-            if(res === 'Login') {
-                new LoginHandler().showLoginPanel();
-            }
-            else {
-                new RegisterHandler().doRegister();
-            }
-        }
-        return;
-    }
+   
    let file = await vscode.window.showOpenDialog(options);
     if(file === undefined) {return;}
     
@@ -107,7 +83,7 @@ function setupFile(path: string, destPath: string, options: any) {
             if(options.platforms) {
                 for(let i = 0; i < options.platforms.length; i++) {
                     let platform = `<platform>${options.platforms[i]}</platform>`;
-                    if(i < 0 ) {
+                    if(i > 0 ) {
                         platform = '\t\t\t\t\t\t' + platform;
                     }
                     if(i < options.platforms.length - 1) {

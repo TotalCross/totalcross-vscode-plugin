@@ -42,14 +42,6 @@
 			{
 				"command": "extension.deployAndRun",
 				"title": "TotalCross: Deploy&Run"
-			},
-			{
-				"command": "extension.login",
-				"title": "TotalCross: Login"
-			},
-			{
-				"command": "extension.register",
-				"title": "TotalCross: Register"
 			}
 		]
 	},

@@ -4,8 +4,6 @@ import * as vscode from 'vscode';
 var Packager = require('./packager');
 var Deployer = require('./deployer');
 var Creator = require('./creator');
-import {login} from './login'; 
-import { register } from './register';
 
 // this method is called when your extension is activated
 // your extension is activated the very first time the command is executed
@@ -34,19 +32,6 @@ export function activate(context: vscode.ExtensionContext) {
 	 * Deploy and Run
 	 */
 	disposable = vscode.commands.registerCommand('extension.deployAndRun', Deployer.deployAndRun);
-	context.subscriptions.push(disposable);
-	
-	
-	/**
-	 * Login
-	 */
-	disposable = vscode.commands.registerCommand('extension.login', login);
-	context.subscriptions.push(disposable);
-
-	/**
-	 * Register
-	 */
-	disposable = vscode.commands.registerCommand('extension.register', register);
 	context.subscriptions.push(disposable);
 }
 
