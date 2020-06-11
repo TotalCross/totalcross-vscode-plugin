@@ -1,14 +1,12 @@
-# Change Log
-dddd
-dd
+# Changelog
+All notable changes to this project will be documented in this file.
 
-All notable changes to the "totalcross" extension will be documented in this file.
-ddd
+The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
+and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how to structure this file.
-dd
 
 ## [Unreleased]
 
-- Initial release
-- lalal
+## [0.0.8] - 2020-06-11
+### Changed
+- Removed Login and Register.
