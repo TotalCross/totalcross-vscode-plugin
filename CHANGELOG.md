@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.0.9] - 2020-07-14
+### Added
+- Ask to collect anonymous data.
+
 ## [0.0.8] - 2020-06-11
 ### Changed
 - Removed Login and Register.
