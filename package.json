@@ -1,9 +1,9 @@
 {
-	"name": "totalcross",
-	"displayName": "TotalCross Project Extension",
+	"name": "vscode-totalcross",
+	"displayName": "TotalCross Extension",
 	"description": "This is TotalCross plugin extension for vs code. ",
 	"version": "0.0.9",
-	"publisher": "Italo",
+	"publisher": "TotalCross",
 	"preview": true,
 	"icon": "icon.png",
 	"engines": {
@@ -76,5 +76,8 @@
 		"request-promise": "^4.2.5",
 		"totalcross-core-dev": "^1.0.4",
 		"xml-js": "^1.6.11"
-	}
+	},
+	"extensionDependencies": [
+		"vscjava.vscode-java-pack"
+	]	
 }
