@@ -53,7 +53,7 @@
             <plugin>
                 <groupId>com.totalcross</groupId>
                 <artifactId>totalcross-maven-plugin</artifactId>
-                <version>1.1</version>
+                <version>1.1.4</version>
                 <configuration>
                     <name>${project.name}</name>
                     <platforms>
