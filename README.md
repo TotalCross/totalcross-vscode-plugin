@@ -4,7 +4,7 @@
 <h1>TotalCross Plugin</h1> </div>
 <p align="center">The simplest way to start coding with TotalCross</strong></em></p>
 
-TotalCross Plugin for VSCode is a tool that allows people coding with TotalCross to jump in the coding part without needing to set up their own TC Virtual Machine and project folder structure. It sorts it all for you!
+TotalCross Plugin for VSCode is a tool that allows people coding with TotalCross to jump in the coding part without needing to set up their own TC SDK and project folder structure. It sorts it all for you!
 
 ## Features
 
