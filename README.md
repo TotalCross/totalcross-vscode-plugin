@@ -15,9 +15,8 @@ TotalCross Plugin for VSCode is a tool that allows people coding with TotalCross
 
 ## Requirements
 
-- Java JDK 1.8 | [offical](https://www.oracle.com/technetwork/java/javase/downloads/jdk8-downloads-2133151.html) | [azul openjdk](https://www.azul.com/downloads/zulu-community/?&version=java-8-lts&architecture=x86-64-bit&package=jdk) |
+- Java JDK 11 | [offical](https://www.oracle.com/java/technologies/javase-jdk11-downloads.html) | [azul openjdk](https://www.azul.com/downloads/zulu-community/?version=java-11-lts&architecture=x86-64-bit&package=jdk) |
 - Maven 3.6.2 | [download](https://maven.apache.org/download.cgi) | [how to install](https://maven.apache.org/install.html) |
-- Microsoft Java Extension Plugin for vscode | [home](https://marketplace.visualstudio.com/items?itemName=vscjava.vscode-java-pack) |
 
 ## Using TotalCross Plugin
 
