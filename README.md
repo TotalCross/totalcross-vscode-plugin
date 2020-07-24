@@ -65,12 +65,13 @@ To contribute, follow these steps:
 4. Push to the original branch: `git push origin <project_name>/<location>`
 5. Create the pull request.
 
-## Contributors
+## Mainteners
 
 Thanks to the following people who have contributed to this project:
 
 - [@ItaloYeltsin](https://github.com/ItaloYeltsin) 💻
 - [@acmlira](https://github.com/acmlira) 💻
+- [@ricardobna](https://github.com/ricardobna) 💻
 - [@nmarquesin](https://github.com/nmarquesin) 📖
 
 ## Contact
