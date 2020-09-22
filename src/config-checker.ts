@@ -62,22 +62,8 @@ export class ConfigChecker {
             if(input === false) {
                 return null;
             }
-            await this.getUuid(data);
-            this.saveConfig(data);
+            
         }
-        else if(!data.uuid) {
-            await this.getUuid(data);
-            this.saveConfig(data);
-        }
-    }
-
-    async getUuid(obj: any) {
-        return request(this.reqAddress)
-            .then(function(res: any) {
-                if(res) {
-                    obj.uuid = JSON.parse(res).uuid;
-                }
-            });
     }
 
     async saveConfig(data: any) {
