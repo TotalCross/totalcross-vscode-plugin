@@ -5,6 +5,10 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [0.0.12] - 2020-08-05
+### Added
+- Now uses the new `totalcross-core` function to get the latest version of `totalcross-maven-plugin`.
+
+## [0.0.12] - 2020-08-05
 ### Changed
 - Hotfix: changes totalcross-maven-plugin version to 1.2.0.
   - this version of totalcross-maven-plugin has a bunch of improvements such as capability of easily packaging totalcross libraries and import them to projects.
