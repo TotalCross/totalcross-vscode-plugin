@@ -73,7 +73,7 @@
 		"replace-in-file": "^4.2.0",
 		"request": "^2.88.2",
 		"request-promise": "^4.2.5",
-		"totalcross-core-dev": "^1.0.4",
+		"totalcross-core-dev": "^1.1.0",
 		"xml-js": "^1.6.11"
 	},
 	"extensionDependencies": [

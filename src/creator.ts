@@ -55,7 +55,9 @@ exports.createNewProject = async function(context: vscode.ExtensionContext) {
     let activationKey = "5443444B5AAEEB90306B00E4";
     if(!activationKey) {return;}
     
-    let props = {artifactID, groupID, platforms, version, activationKey};
+    let mavenPluginVersion = await core.mavenPluginLatestVersion();
+
+    let props = {artifactID, groupID, platforms, version, activationKey, mavenPluginVersion};
     let path = file[0].fsPath.toString();
     let packagePath = path + '/src/main/java/' + groupID.replace(/\./g, "/");
     
@@ -97,7 +99,8 @@ function setupFile(path: string, destPath: string, options: any) {
             await replace({files: destPath, from: /\${'artifactid'}/g, to: options.artifactID}); 
             await replace({files: destPath, from: /\${'version'}/g, to: options.version}); 
             await replace({files: destPath, from: /\${'platforms'}/g, to: platformsStr}); 
-            await replace({files: destPath, from: /\${'activation_key'}/g, to: options.activationKey}); 
+            await replace({files: destPath, from: /\${'activation_key'}/g, to: options.activationKey});
+            await replace({files: destPath, from: /\${'maven_plugin_version'}/g, to: options.mavenPluginVersion})
         })
         .catch(function(err: any) {
             vscode.window.showErrorMessage(err);
