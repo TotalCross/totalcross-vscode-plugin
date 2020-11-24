@@ -4,7 +4,7 @@
 <h1>TotalCross Plugin</h1> </div>
 <p align="center">The simplest way to start coding with TotalCross</strong></em></p>
 
-TotalCross Plugin for VSCode is a tool that allows people coding with TotalCross to jump in the coding part without needing to set up their own TC SDK and project folder structure. It sorts it all for you!
+TotalCross is an open source cross-platform SDK developed to bring speed to GUI creation for embedded devices. TotalCross has the development benefits from Java without the need of Java running on the device, as it uses its own bytecode and virtual machine (TC bytecode and TCVM), created specifically for performance enhancement. TotalCross runtime is currently at 5MB to bring mobile grade user experience even for low-end MPUs.
 
 ## Features
 
