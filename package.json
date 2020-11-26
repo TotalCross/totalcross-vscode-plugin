@@ -2,7 +2,7 @@
 	"name": "vscode-totalcross",
 	"displayName": "TotalCross Extension",
 	"description": "This is TotalCross plugin extension for vs code. ",
-	"version": "0.0.13",
+	"version": "0.0.14",
 	"publisher": "TotalCross",
 	"icon": "icon.png",
 	"engines": {
