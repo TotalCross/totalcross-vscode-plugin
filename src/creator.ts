@@ -74,10 +74,6 @@ exports.createNewProject = async function(context: vscode.ExtensionContext) {
     vscode.commands.executeCommand('vscode.openFolder', uri);
 };
 
-
-
-
-
 function setupFile(path: string, destPath: string, options: any) {
     return fs.copy(path, destPath)
         .then(async function() {
@@ -86,7 +82,7 @@ function setupFile(path: string, destPath: string, options: any) {
             if(options.platforms) {
                 for(let i = 0; i < options.platforms.length; i++) {
                     let platform = `<platform>${options.platforms[i]}</platform>`;
-                    if(i < 0 ) {
+                    if(i > 0) {
                         platform = '\t\t\t\t\t\t' + platform;
                     }
                     if(i < options.platforms.length - 1) {
