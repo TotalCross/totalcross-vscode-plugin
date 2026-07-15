@@ -51,13 +51,13 @@ The plan must not claim that code originally distributed under MIT retroactively
 - [x] (2026-07-15) Added `.github/workflows/governance-validation.yml` invoking the documented validator and test commands.
 - [x] (2026-07-15) Added historical MIT headers to 21 applicable `src/`, `resources/`, and shell files; generated Maven metadata remains untouched.
 - [x] (2026-07-15) Reviewed the governance diff; it contains attribution, licensing, planning, validation, CI, and header changes only.
-- [ ] Create the first governance commit.
-- [ ] Run the complete validation and focused build/test suite from the governance commit.
-- [ ] Inspect architecture, packages, modules, dependencies, naming, duplicated code, dead code, build structure, tests, and public APIs for refactoring opportunities.
-- [ ] Write proposed refactoring groups in `Decision Log` before changing code.
-- [ ] Implement refactoring in logical, independently buildable commits.
-- [ ] After each refactoring commit, run the smallest sufficient validation set and record meaningful findings.
-- [ ] Run the full supported build and test suite after the final refactoring commit.
+- [x] (2026-07-15) Created governance commit `ca549be` (`chore(governance): migrate project licensing to Apache-2.0`).
+- [x] (2026-07-15) Ran governance validation and 14 focused tests from the governance baseline; compile failure was isolated to a resolved `@types/vscode` version incompatible with TypeScript 3.9.10, before project source compilation.
+- [x] (2026-07-15) Inspected module sizes, package boundaries, build configuration, dependencies, source/test layout, public extension entry points, and obvious sensitive logging. The only safe, independently testable change within scope is deterministic type dependency resolution.
+- [x] (2026-07-15) Recorded the build dependency refactoring group before changing it.
+- [x] (2026-07-15) Implemented the build dependency refactoring by pinning `@types/vscode` to 1.40.0; `npm run compile`, governance validation, and 14 governance unit tests pass.
+- [x] (2026-07-15) Ran focused validation for the build dependency refactoring; no source or public API behavior changed.
+- [x] (2026-07-15) Ran the full supported `npm test` suite successfully after recompilation; it downloaded and launched VS Code 1.129.0 through `vscode-test`.
 - [ ] Review the final commit sequence for accidental mixing of governance and implementation work.
 - [ ] Complete `Outcomes & Retrospective` with counts, commands, commit hashes, exceptions, and follow-up items.
 
@@ -161,6 +161,10 @@ Do not silently resolve legal, attribution, or historical ambiguity. Record the 
 
 - Decision: Defer the TypeScript/@types VS Code compatibility repair to a post-governance build refactoring commit.
   Rationale: The failure is pre-existing dependency-resolution drift caused by the unpinned development dependency range, not a licensing or attribution change. Keeping it separate preserves the reviewable governance baseline.
+  Date: 2026-07-15
+
+- Decision: Pin `@types/vscode` to `1.40.0` in a standalone `refactor(build)` commit, while retaining the established TypeScript `^3.6.4` range.
+  Rationale: The extension declares VS Code engine `^1.40.0`; the old caret on its corresponding type definitions resolved to 1.125.0, whose declarations cannot be parsed by the resolved TypeScript 3.9.10 compiler. The exact historical API type package restores a reproducible compatible bound without changing runtime dependencies or extension behavior.
   Date: 2026-07-15
 
 ## Outcomes & Retrospective
