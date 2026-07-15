@@ -1,3 +1,8 @@
+/*
+ * Copyright (C) 2020-2021 TotalCross Global Mobile Platform Ltda.
+ * SPDX-License-Identifier: MIT
+ */
+
 import * as path from 'path';
 import * as Mocha from 'mocha';
 import * as glob from 'glob';

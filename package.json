@@ -49,6 +49,8 @@
 		"vscode:prepublish": "npm run compile",
 		"compile": "tsc -p ./",
 		"watch": "tsc -watch -p ./",
+		"validate:governance": "python3 tools/check-repository-governance.py",
+		"test:governance": "python3 -m unittest tests.test_repository_governance",
 		"pretest": "npm run compile",
 		"test": "node ./out/test/runTest.js"
 	},

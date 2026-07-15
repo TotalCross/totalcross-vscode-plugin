@@ -1,3 +1,8 @@
+/*
+ * Copyright (C) 2020-2021 TotalCross Global Mobile Platform Ltda.
+ * SPDX-License-Identifier: MIT
+ */
+
 import * as vscode from 'vscode';
 
 export function showInputBox(prompt: string, placeHolder: string, validator: any) {
