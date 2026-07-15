@@ -26,7 +26,8 @@ Packaging places the target program in `target/install/<platform>`.
 
 From the repository root, run:
 
-    npm install
+    npm ci
+    npm run audit
     npm run compile
     python3 tools/check-repository-governance.py
     python3 -m unittest tests.test_repository_governance

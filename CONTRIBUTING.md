@@ -32,6 +32,7 @@ Run these commands from the repository root before opening a pull request:
 
     python3 tools/check-repository-governance.py
     python3 -m unittest tests.test_repository_governance
+    npm run audit
     npm run compile
 
 Run `npm test` when the VS Code integration-test prerequisites are available.

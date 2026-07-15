@@ -5,14 +5,10 @@
 
 import * as vscode from 'vscode';
 import {showInputBox} from './components/components';
-import { pathToFileURL } from 'url';
-import * as util from './util';
+import {latestMavenPluginVersion, latestTotalCrossSdkVersions} from './maven-metadata';
 
-const core = require('totalcross-core-dev');
 const validators = require('./validators/creator');
 const fs = require('fs-extra');
-const request = require('request');
-const xmlParser = require('xml-js');
 const replace = require('replace-in-file');
 
 const options: vscode.OpenDialogOptions = {
@@ -40,7 +36,7 @@ exports.createNewProject = async function(context: vscode.ExtensionContext) {
         validators.artifactId
         );
     if(!artifactID) {return;}
-    let availableVersions = await core.latestVersions(`${context.extensionPath}/resources/maven-metadata.xml`);
+    let availableVersions = await latestTotalCrossSdkVersions(`${context.extensionPath}/resources/maven-metadata.xml`);
     let version = await vscode.window.showQuickPick(availableVersions, {
         placeHolder: 'totalcross sdk version',
         ignoreFocusOut: true
@@ -60,7 +56,7 @@ exports.createNewProject = async function(context: vscode.ExtensionContext) {
     let activationKey = "5443444B5AAEEB90306B00E4";
     if(!activationKey) {return;}
     
-    let mavenPluginVersion = await core.mavenPluginLatestVersion();
+    let mavenPluginVersion = await latestMavenPluginVersion();
 
     let props = {artifactID, groupID, platforms, version, activationKey, mavenPluginVersion};
     let path = file[0].fsPath.toString();

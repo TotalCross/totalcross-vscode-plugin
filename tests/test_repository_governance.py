@@ -27,6 +27,7 @@ class RepositoryGovernanceTest(unittest.TestCase):
         self.write("AGENTS.md", html_header + "Fabio Sobral is the sole current maintainer.\n")
         self.write("NOTICE", "Italo Yeltsin\nFabio Sobral\nMIT\nApache\n")
         self.write("LICENSE", "Apache License\nVersion 2.0, January 2004\n")
+        self.write("package-lock.json", "{\"lockfileVersion\": 3, \"packages\": {}}\n")
         self.write(".agent/PLANS.md", html_header + "Outcomes & Retrospective\nEditorial Report\n")
         self.write(".github/CODEOWNERS", hash_header + "* @flsobral\n")
         self.write(".github/workflows/governance-validation.yml", hash_header + "name: test\n")
@@ -54,6 +55,10 @@ class RepositoryGovernanceTest(unittest.TestCase):
 
     def test_valid_amalgam_apache_header(self):
         errors = self.errors_for("tools/check-repository-governance.py", f"# {governance.AMALGAM_COPYRIGHT}\n# {governance.APACHE}\n")
+        self.assertEqual([], errors)
+
+    def test_new_amalgam_source_header_is_validated(self):
+        errors = self.errors_for("src/maven-metadata.ts", f"/*\n * {governance.AMALGAM_COPYRIGHT}\n * {governance.APACHE}\n */\n")
         self.assertEqual([], errors)
 
     def test_amalgam_mit_header_is_rejected(self):
@@ -100,6 +105,11 @@ class RepositoryGovernanceTest(unittest.TestCase):
         self.write("README.md", "The original creator is Italo Yeltsin. Fabio Sobral maintains this.\n")
         self.track()
         self.assertIn("README.md: must identify Fabio Sobral as sole current maintainer", governance.validate(self.root))
+
+    def test_invalid_lockfile_is_rejected(self):
+        self.write("package-lock.json", "not json\n")
+        self.track()
+        self.assertIn("package-lock.json: must be valid JSON", governance.validate(self.root))
 
     def test_diagnostics_are_sorted(self):
         self.write("src/z.ts", "")

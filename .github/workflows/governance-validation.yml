@@ -12,8 +12,13 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
       - uses: actions/setup-python@v5
         with:
           python-version: '3.x'
+      - run: npm ci --ignore-scripts
+      - run: npm run audit
       - run: python3 tools/check-repository-governance.py
       - run: python3 -m unittest tests.test_repository_governance

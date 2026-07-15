@@ -62,6 +62,10 @@ The plan must not claim that code originally distributed under MIT retroactively
 - [x] (2026-07-15) Implemented and validated the test tooling refactoring: `npm test` launches VS Code 1.129.0 and reports two passing extension tests after clearing the inherited Electron Node-mode marker.
 - [x] (2026-07-15) Reviewed the final sequence: `ca549be` is governance-only; `b7072bd` isolates dependency compatibility; `d8dc0e6` isolates integration-test tooling.
 - [x] (2026-07-15) Completed `Outcomes & Retrospective` and the evidence-based `Editorial Report` below.
+- [x] (2026-07-15) Reopened the ExecPlan at the maintainer's request to correct dependency vulnerabilities; confirmed that the repository lacks a lockfile and therefore `npm audit` cannot produce a trustworthy dependency graph.
+- [x] (2026-07-15) Generated `package-lock.json` and audited the reproducible graph: 17 findings (2 critical, 4 high, 9 moderate, 2 low) came from request-related runtime dependencies, `node-ssh`, Mocha, TSLint, and their transitives.
+- [x] (2026-07-15) Applied the dependency security corrections and validated an installation from the lockfile: `npm audit` now reports 0 vulnerabilities; compilation, governance validation (15 tests), and the three-test VS Code integration suite pass.
+- [ ] Commit the security correction and reconcile its hash and evidence into the final outcome sections.
 
 ## Surprises & Discoveries
 
@@ -96,6 +100,15 @@ Do not silently resolve legal, attribution, or historical ambiguity. Record the 
 
 - Observation: The Electron launch errors are caused by the inherited `ELECTRON_RUN_AS_NODE=1` environment variable, not by the downloaded VS Code application.
   Evidence: The active extension-host environment contains that variable; Electron reports Node-style `bad option` errors for the VS Code launch arguments. Removing it before `runTests` lets Electron launch as the VS Code application.
+
+- Observation: `npm audit` cannot run without a lockfile, so the prior vulnerability count was tied to a transient local install and could not be reproduced from version-controlled dependency metadata.
+  Evidence: `npm audit --json` exits with `ENOLOCK` and requests `npm i --package-lock-only`; no `package-lock.json` is tracked.
+
+- Observation: Updating Mocha to its audit-safe major removes the `useColors` instance method used by the legacy test runner.
+  Evidence: Compilation after the dependency update reports `Property 'useColors' does not exist on type 'Mocha'` in `src/test/suite/index.ts`; the equivalent supported constructor option is `color: true`.
+
+- Observation: The lockfile-backed audit initially found 17 vulnerabilities, including two critical findings in the abandoned request stack; after the replacements, upgrades, and overrides it found zero.
+  Evidence: `npm install --ignore-scripts && npm audit` reported 17 findings before the changes, while `npm ci --ignore-scripts && npm run audit` completed with `found 0 vulnerabilities` afterward.
 
 ## Decision Log
 
@@ -192,6 +205,26 @@ Do not silently resolve legal, attribution, or historical ambiguity. Record the 
 
 - Decision: Keep the historical MIT header on `src/test/runTest.ts` after the narrow test-runner changes.
   Rationale: The file remains predominately 2019 TotalCross work; the import and environment sanitization are a minimal compatibility adjustment. The validator records it as historical work and preserves the existing MIT notice rather than asserting an unsupported whole-file relicensing.
+  Date: 2026-07-15
+
+- Decision: Add and maintain `package-lock.json` as part of the vulnerability correction work.
+  Rationale: A lockfile makes the dependency graph reproducible, lets `npm audit` analyze the exact resolved packages, and prevents security results from silently changing between installs. It will be generated with npm and reviewed as dependency metadata, not hand-edited.
+  Date: 2026-07-15
+
+- Decision: Remove the abandoned `request` stack and `totalcross-core-dev` rather than accepting an unsafe forced audit fix.
+  Rationale: `request`, `request-promise`, and `totalcross-core-dev` keep the two critical advisories reachable and have no safe compatible audit fix. The extension uses only the core package's Maven metadata helpers, so those helpers will be implemented locally with Node's `https` module and the already-present `xml-js` parser. The unused direct request imports will be removed.
+  Date: 2026-07-15
+
+- Decision: Replace `pom-parser` with the existing `xml-js` dependency, update `node-ssh` and Mocha to their audit-safe majors, and add focused Maven metadata parsing coverage.
+  Rationale: `pom-parser` has no upstream audit fix and only supplies a project name from POM XML. `node-ssh` and Mocha have published upgrade paths that remove their vulnerable transitive dependencies. Parsing tests protect the new local metadata helper without depending on a network service.
+  Date: 2026-07-15
+
+- Decision: Remove the unused, deprecated TSLint dependency and use npm overrides for Mocha's vulnerable transitive packages.
+  Rationale: No npm script invokes TSLint, and keeping an unused deprecated tool preserves vulnerable `diff` and `js-yaml` packages. Mocha's published range still resolves vulnerable versions of `diff` and `serialize-javascript`; exact npm overrides select their patched releases and will be proven by the extension test suite.
+  Date: 2026-07-15
+
+- Decision: Retain the historical MIT headers on modified legacy source files and use Apache-2.0 headers only for the new Maven metadata module and its test.
+  Rationale: `src/creator.ts`, `src/deployer.ts`, `src/config-checker.ts`, `src/util.ts`, and the existing test runner remain predominately historical TotalCross work. The security edits are narrow replacements or removals within those files. `src/maven-metadata.ts` and `src/test/suite/maven-metadata.test.ts` are newly authored current-period work and are classified and validated as Amalgam Apache-2.0.
   Date: 2026-07-15
 
 ## Outcomes & Retrospective

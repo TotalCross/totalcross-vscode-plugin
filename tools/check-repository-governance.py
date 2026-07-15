@@ -7,6 +7,7 @@
 from __future__ import annotations
 
 import argparse
+import json
 import subprocess
 import sys
 from pathlib import Path
@@ -20,6 +21,8 @@ OBSOLETE_EMAIL = "br.yeltsin" + "@gmail.com"
 HISTORICAL_PATHS = ("src/", "resources/")
 HISTORICAL_EXCLUSIONS = {"resources/maven-metadata.xml"}
 AMALGAM_C_PATHS = {
+    "src/maven-metadata.ts",
+    "src/test/suite/maven-metadata.test.ts",
     "tools/check-repository-governance.py",
     "tests/test_repository_governance.py",
 }
@@ -51,10 +54,10 @@ def classify(path: str) -> str:
         return "mixed"
     if path in EXCLUDED_PATHS or path in HISTORICAL_EXCLUSIONS or path.startswith(EXCLUDED_PREFIXES):
         return "excluded"
-    if path == "test.sh" or (path.startswith(HISTORICAL_PATHS) and path not in HISTORICAL_EXCLUSIONS):
-        return "historical"
     if path in AMALGAM_C_PATHS or path in AMALGAM_HASH_PATHS or path in AMALGAM_HTML_PATHS:
         return "amalgam"
+    if path == "test.sh" or (path.startswith(HISTORICAL_PATHS) and path not in HISTORICAL_EXCLUSIONS):
+        return "historical"
     return "metadata"
 
 
@@ -99,6 +102,7 @@ def validate_metadata(root: Path, paths: list[str]) -> list[str]:
         "AGENTS.md",
         "NOTICE",
         "LICENSE",
+        "package-lock.json",
         ".agent/PLANS.md",
         ".github/CODEOWNERS",
         ".github/workflows/governance-validation.yml",
@@ -114,6 +118,7 @@ def validate_metadata(root: Path, paths: list[str]) -> list[str]:
     contributing = read_text(root, "CONTRIBUTING.md")
     notice = read_text(root, "NOTICE")
     license_text = read_text(root, "LICENSE")
+    lockfile = read_text(root, "package-lock.json")
     codeowners = read_text(root, ".github/CODEOWNERS")
     plans = read_text(root, ".agent/PLANS.md")
     if "original creator" not in readme.lower() or "Italo Yeltsin" not in readme:
@@ -132,6 +137,11 @@ def validate_metadata(root: Path, paths: list[str]) -> list[str]:
         errors.append("NOTICE: must preserve required attribution and transition information")
     if "Apache License" not in license_text or "Version 2.0, January 2004" not in license_text:
         errors.append("LICENSE: must contain the complete Apache License 2.0 text")
+    try:
+        if not isinstance(json.loads(lockfile).get("lockfileVersion"), int):
+            errors.append("package-lock.json: must be a valid npm lockfile")
+    except ValueError:
+        errors.append("package-lock.json: must be valid JSON")
     if "* @flsobral" not in codeowners:
         errors.append(".github/CODEOWNERS: must assign the default owner to @flsobral")
     if "Editorial Report" not in plans or "Outcomes & Retrospective" not in plans:

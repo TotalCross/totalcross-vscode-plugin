@@ -6,8 +6,9 @@
 import * as vscode from 'vscode';
 var node_ssh = require('node-ssh');
 var validators = require('./validators/deployer');
-const pomParser = require('pom-parser');
 const Packager = require('./packager');
+const fs = require('fs-extra');
+const xmlParser = require('xml-js');
 
 var ssh = new node_ssh();
 var folder: any;
@@ -15,6 +16,12 @@ var username: any;
 var host: any;
 var pom: any;
 var password: any;
+
+async function readPom(pomPath: string): Promise<any> {
+    const contents = await fs.readFile(pomPath, 'utf8');
+    return JSON.parse(xmlParser.xml2json(contents, {compact: true}));
+}
+
 exports.deploy = async function() {
     return new Promise(async function (resolve){
         let workspaceFolders = vscode.workspace.workspaceFolders;
@@ -25,11 +32,7 @@ exports.deploy = async function() {
     }
     let file = workspaceFolders[0].uri.fsPath + "/target/install/linux_arm";
     let pomPath = workspaceFolders[0].uri.fsPath + "/pom.xml";
-    pom = await new Promise(resolve2 => {
-        pomParser.parse({filePath: pomPath}, function(err: any, response: any) {
-            resolve2(response.pomObject);
-        });
-    });
+    pom = await readPom(pomPath);
     // ask user
     if(!username) {
         username = await vscode.window.showInputBox({
@@ -56,7 +59,6 @@ exports.deploy = async function() {
             prompt: 'host password',
             value: password === undefined ? undefined : password
         });
-        console.log(password);
     }
     // ask app folder
     // ask user
