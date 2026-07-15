@@ -65,7 +65,7 @@ The plan must not claim that code originally distributed under MIT retroactively
 - [x] (2026-07-15) Reopened the ExecPlan at the maintainer's request to correct dependency vulnerabilities; confirmed that the repository lacks a lockfile and therefore `npm audit` cannot produce a trustworthy dependency graph.
 - [x] (2026-07-15) Generated `package-lock.json` and audited the reproducible graph: 17 findings (2 critical, 4 high, 9 moderate, 2 low) came from request-related runtime dependencies, `node-ssh`, Mocha, TSLint, and their transitives.
 - [x] (2026-07-15) Applied the dependency security corrections and validated an installation from the lockfile: `npm audit` now reports 0 vulnerabilities; compilation, governance validation (15 tests), and the three-test VS Code integration suite pass.
-- [ ] Commit the security correction and reconcile its hash and evidence into the final outcome sections.
+- [x] (2026-07-15) Committed the security correction as `9cb6cd6` (`fix(security): remediate vulnerable dependencies`) and reconciled its evidence below.
 
 ## Surprises & Discoveries
 
@@ -273,8 +273,17 @@ No public extension command, runtime dependency, API, resource path, or
 platform behavior changed. Broader source reorganization and security-related
 cleanup were considered but rejected because the small codebase has sparse
 behavioral coverage and those changes were not necessary to make the baseline
-valid and buildable. npm reports 17 dependency vulnerabilities after the final
-install; dependency security modernization is a separate follow-up.
+valid and buildable.
+
+The resumed security milestone added `package-lock.json`, then reduced the
+reproducible `npm audit` result from 17 findings (including two critical) to
+zero. Commit `9cb6cd6` removes the abandoned request stack and its unused
+imports, replaces `totalcross-core-dev` metadata access with
+`src/maven-metadata.ts`, replaces `pom-parser`, upgrades `node-ssh` and Mocha,
+and removes unused TSLint. It also adds an audit script, CI audit step, lockfile
+validation, and one Maven metadata test. `npm ci --ignore-scripts`, `npm run
+audit`, compilation, 16 governance tests, and the three-test VS Code suite all
+passed.
 
 ## Editorial Report
 
@@ -291,6 +300,9 @@ The execution also restored a usable development verification path: compilation
 uses a compatible VS Code type definition package, and the extension tests run
 successfully from a VS Code-hosted development environment.
 
+The later security milestone makes that verification reproducible with a
+lockfile and keeps the audited npm graph free of known vulnerabilities.
+
 ### Original Plan versus Actual Outcome
 
 The governance transition, attribution documentation, header normalization,
@@ -298,7 +310,9 @@ validator, tests, CI, and logical baseline commit were delivered as planned.
 The code review found no safe structural reorganization worth manufacturing.
 Instead, it found two concrete build/test compatibility regressions caused by
 dependency and host-environment drift; those were resolved in two separately
-reviewable refactoring commits.
+reviewable refactoring commits. After the original plan completed, the
+maintainer requested vulnerability remediation; that resumed milestone replaced
+the vulnerable dependency chains and completed with a zero-finding audit.
 
 ### What Changed
 
@@ -313,7 +327,9 @@ headers were added to `src/`, first-party `resources/`, and `test.sh`.
 `package.json` pins the VS Code API type package and adopts
 `@vscode/test-electron`. `src/test/runTest.ts` clears an inherited process
 variable before launching VS Code so the integration application is not forced
-into Node mode.
+into Node mode. `package-lock.json` fixes the dependency graph,
+`src/maven-metadata.ts` replaces the request-based metadata helper, and the CI
+workflow runs `npm ci` plus `npm run audit` before governance checks.
 
 ### Decisions and Trade-offs
 
@@ -323,7 +339,9 @@ releases were retroactively relicensed. Header enforcement deliberately uses a
 small Python script and explicit path categories, trading automatic historical
 inference for readable, auditable rules. The maintained test package is kept on
 its 2.5 major line because its 3.0 declarations are incompatible with the
-project's TypeScript compiler.
+project's TypeScript compiler. The security fix avoids `npm audit fix --force`:
+it removes abandoned runtime dependencies and applies narrowly scoped npm
+overrides for Mocha's vulnerable transitives, validated by the test suite.
 
 ### Unexpected Problems and Discoveries
 
@@ -331,7 +349,10 @@ An unpinned VS Code type dependency resolved to 1.125.0, which TypeScript 3.9
 could not parse. The deprecated test wrapper then failed to launch a current
 macOS VS Code, and the maintained replacement initially inherited
 `ELECTRON_RUN_AS_NODE=1` from the host process. Removing that variable at the
-test launcher boundary produced a successful test run.
+test launcher boundary produced a successful test run. The security work then
+found that no lockfile existed, so the previous audit count could not be
+reproduced; adding one exposed the abandoned request stack as the source of the
+critical findings.
 
 ### Validation and Measurable Results
 
@@ -344,23 +365,26 @@ Observed successful commands were:
 
 The governance validator passed; 14 governance tests passed; compilation
 passed; and the VS Code integration run reported two passing tests and exit
-code 0. The final search found zero current-content occurrences of the obsolete
-contact address. No performance or artifact-size measurement was taken.
+code 0. After the security milestone, `npm ci --ignore-scripts` and `npm run
+audit` passed with zero audit findings; the governance suite grew to 16 tests
+and the integration run reported three passing tests. The final search found
+zero current-content occurrences of the obsolete contact address. No
+performance or artifact-size measurement was taken.
 
 ### Useful Evidence and Examples
 
-The three commits `ca549be`, `b7072bd`, and `d8dc0e6` separate the governance,
-build, and test work. `tools/check-repository-governance.py` and
+The four commits `ca549be`, `b7072bd`, `d8dc0e6`, and `9cb6cd6` separate the
+governance, build, test, and security work. `tools/check-repository-governance.py` and
 `tests/test_repository_governance.py` provide reproducible policy evidence.
-The final `npm test` transcript records the two passing extension tests.
+The final `npm test` transcript records the three passing extension tests, and
+`package-lock.json` provides the audited dependency graph.
 
 ### Limitations, Remaining Work, and Open Questions
 
 The authority for prospective relicensing follows the requested governance
-decision and was not independently verified with external legal records.
-The repository has no lockfile, so transitive dependencies can still drift.
-npm reports 17 vulnerabilities in the installed dependency tree; resolving
-them safely requires a dedicated dependency upgrade and compatibility review.
+decision and was not independently verified with external legal records. npm
+audit currently reports zero vulnerabilities for the lockfile, but audit data
+can change and the dependency graph should continue to be checked in CI.
 Existing extension tests remain minimal and do not characterize deployment,
 packaging, or project-creation behavior.
 
@@ -839,9 +863,13 @@ The plan is complete only when all applicable conditions are observable:
 - [x] Public API and compatibility impacts are documented.
 - [x] Full final build/tests pass.
 - [x] `git diff --check` passes.
-- [x] Working tree is clean after this plan-record commit.
+- [x] Working tree is clean after the current final plan-record commit.
 - [x] `Outcomes & Retrospective` is complete.
 
 Revision note (2026-07-15): recorded the completed governance transition,
 dependency and test-runner compatibility refactorings, observed validation
-results, remaining dependency-security work, and the final Editorial Report.
+results, and the final Editorial Report.
+
+Revision note (2026-07-15, resumed): added the maintainer-requested
+vulnerability remediation milestone, its reproducible audit baseline and zero
+finding result, the lockfile/CI enforcement, and commit `9cb6cd6`.
