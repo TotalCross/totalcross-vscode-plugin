@@ -5,7 +5,11 @@
 
 import * as path from 'path';
 
-import { runTests } from 'vscode-test';
+import { runTests } from '@vscode/test-electron';
+
+// A VS Code extension host sets this for Node-based extension processes. The
+// integration runner must launch the downloaded Electron application instead.
+delete process.env.ELECTRON_RUN_AS_NODE;
 
 async function main() {
 	try {
