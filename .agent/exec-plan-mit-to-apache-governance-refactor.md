@@ -60,8 +60,8 @@ The plan must not claim that code originally distributed under MIT retroactively
 - [x] (2026-07-15) Ran the full supported `npm test` suite after recompilation; the deprecated `vscode-test` wrapper downloaded VS Code 1.129.0 but failed to launch it on macOS with unsupported Electron option errors.
 - [x] (2026-07-15) Recorded a second build/test tooling refactoring group before changing it: replace the deprecated wrapper with its maintained `@vscode/test-electron` successor.
 - [x] (2026-07-15) Implemented and validated the test tooling refactoring: `npm test` launches VS Code 1.129.0 and reports two passing extension tests after clearing the inherited Electron Node-mode marker.
-- [ ] Review the final commit sequence for accidental mixing of governance and implementation work.
-- [ ] Complete `Outcomes & Retrospective` with counts, commands, commit hashes, exceptions, and follow-up items.
+- [x] (2026-07-15) Reviewed the final sequence: `ca549be` is governance-only; `b7072bd` isolates dependency compatibility; `d8dc0e6` isolates integration-test tooling.
+- [x] (2026-07-15) Completed `Outcomes & Retrospective` and the evidence-based `Editorial Report` below.
 
 ## Surprises & Discoveries
 
@@ -196,26 +196,166 @@ Do not silently resolve legal, attribution, or historical ambiguity. Record the 
 
 ## Outcomes & Retrospective
 
-Complete this section after implementation.
+The `master` branch of `TotalCross/totalcross-vscode-plugin` was inspected at
+`6948213`; the remote history, tags, and old commit identities were preserved
+unchanged. The prior top-level `LICENSE` was MIT with a 2019 TotalCross notice.
+It is now Apache License 2.0 for the current repository baseline. `README.md`
+states that distributions released before this governance change may remain
+available under their accompanying MIT terms and that current controlled work
+is Apache-2.0 unless a file states otherwise.
 
-Include:
+One current-content obsolete-contact occurrence was found in the old README
+and removed. No occurrence remains in current tracked content. Git commit
+metadata was intentionally not rewritten. `AUTHORS.md` preserves the original
+creator Italo Yeltsin, the sole current maintainer Fabio Sobral, and historical
+contributors Allan C, lucasgalvanini, @nmarquesin, and Ricardo Braga based on
+the former README or Git history.
 
-- repository and branch inspected;
-- whether remote history was preserved unchanged;
-- previous authoritative license files found;
-- exact license transition wording added;
-- number of occurrences of the obsolete former project contact address found, removed, excluded, and why;
-- all people listed as historical contributors before and after the change;
-- files identifying Italo Yeltsin as original creator;
-- files identifying Fabio Sobral as sole maintainer;
-- number of files classified as historical MIT, Amalgam Apache-2.0, mixed history, third-party, generated, or unresolved;
-- number of headers changed in each category;
-- validator commands and CI workflow names;
-- governance commit hash and message;
-- refactoring opportunities considered and rejected;
-- refactoring commits created, with purpose and validation performed for each;
-- public API or compatibility impacts;
-- remaining legal, technical, or documentation follow-ups.
+`README.md`, `AUTHORS.md`, `NOTICE`, `CONTRIBUTING.md`, `AGENTS.md`, and
+`.github/CODEOWNERS` identify the roles and transition. Twenty-one historical
+first-party source/template files carry TotalCross MIT headers. Nine new
+governance/tooling documents or scripts carry Amalgam Apache-2.0 headers.
+No mixed-history production file was found before refactoring; the later narrow
+test-runner edit retains the existing historical MIT header as documented in
+the decision log. `resources/maven-metadata.xml` is treated as generated;
+the VS Code quickstart scaffold, binary assets, and a legacy modernization
+ignore file are explicit exclusions. No unresolved ownership ambiguity remains
+within the files changed by this work, but the prospective relicensing authority
+is represented by the requested governance decision rather than independent
+external legal verification.
+
+The local governance checks are `python3 tools/check-repository-governance.py`
+and `python3 -m unittest tests.test_repository_governance`; the GitHub Actions
+workflow is `.github/workflows/governance-validation.yml`. The validator passed
+and its 14 unit tests passed. `npm run compile` passed after the build
+dependency correction. `npm test` passed with two extension tests using VS Code
+1.129.0 and exited with code 0.
+
+The governance commit is `ca549be4b8428ae260df05ec9529578e687fcaac`
+(`chore(governance): migrate project licensing to Apache-2.0`). The later
+`b7072bd` pins `@types/vscode` to 1.40.0 so TypeScript can parse the VS Code
+API types. `d8dc0e6` replaces the deprecated test wrapper and prevents the
+host's Electron Node-mode environment marker from breaking integration tests.
+No public extension command, runtime dependency, API, resource path, or
+platform behavior changed. Broader source reorganization and security-related
+cleanup were considered but rejected because the small codebase has sparse
+behavioral coverage and those changes were not necessary to make the baseline
+valid and buildable. npm reports 17 dependency vulnerabilities after the final
+install; dependency security modernization is a separate follow-up.
+
+## Editorial Report
+
+### Editorial Summary
+
+This work establishes a truthful legal and maintenance baseline for the
+TotalCross VS Code extension. Users and contributors can now see the current
+Apache-2.0 license, the continuing MIT status of historical TotalCross source,
+the original creator, and the sole current maintainer. A local validator and
+matching CI workflow make those rules repeatable rather than relying on manual
+review alone.
+
+The execution also restored a usable development verification path: compilation
+uses a compatible VS Code type definition package, and the extension tests run
+successfully from a VS Code-hosted development environment.
+
+### Original Plan versus Actual Outcome
+
+The governance transition, attribution documentation, header normalization,
+validator, tests, CI, and logical baseline commit were delivered as planned.
+The code review found no safe structural reorganization worth manufacturing.
+Instead, it found two concrete build/test compatibility regressions caused by
+dependency and host-environment drift; those were resolved in two separately
+reviewable refactoring commits.
+
+### What Changed
+
+`LICENSE`, `NOTICE`, `README.md`, `AUTHORS.md`, `CONTRIBUTING.md`, `AGENTS.md`,
+and `.github/CODEOWNERS` define the project license, ownership history, and
+maintenance roles. `tools/check-repository-governance.py` validates headers,
+attribution, and obsolete contact information, while
+`tests/test_repository_governance.py` supplies its focused tests and
+`.github/workflows/governance-validation.yml` runs them in CI. Historical
+headers were added to `src/`, first-party `resources/`, and `test.sh`.
+
+`package.json` pins the VS Code API type package and adopts
+`@vscode/test-electron`. `src/test/runTest.ts` clears an inherited process
+variable before launching VS Code so the integration application is not forced
+into Node mode.
+
+### Decisions and Trade-offs
+
+The repository transition is prospective: the current root license changes,
+but historical source retains MIT headers. This avoids claiming that prior
+releases were retroactively relicensed. Header enforcement deliberately uses a
+small Python script and explicit path categories, trading automatic historical
+inference for readable, auditable rules. The maintained test package is kept on
+its 2.5 major line because its 3.0 declarations are incompatible with the
+project's TypeScript compiler.
+
+### Unexpected Problems and Discoveries
+
+An unpinned VS Code type dependency resolved to 1.125.0, which TypeScript 3.9
+could not parse. The deprecated test wrapper then failed to launch a current
+macOS VS Code, and the maintained replacement initially inherited
+`ELECTRON_RUN_AS_NODE=1` from the host process. Removing that variable at the
+test launcher boundary produced a successful test run.
+
+### Validation and Measurable Results
+
+Observed successful commands were:
+
+    python3 tools/check-repository-governance.py
+    python3 -m unittest tests.test_repository_governance
+    npm run compile
+    npm test
+
+The governance validator passed; 14 governance tests passed; compilation
+passed; and the VS Code integration run reported two passing tests and exit
+code 0. The final search found zero current-content occurrences of the obsolete
+contact address. No performance or artifact-size measurement was taken.
+
+### Useful Evidence and Examples
+
+The three commits `ca549be`, `b7072bd`, and `d8dc0e6` separate the governance,
+build, and test work. `tools/check-repository-governance.py` and
+`tests/test_repository_governance.py` provide reproducible policy evidence.
+The final `npm test` transcript records the two passing extension tests.
+
+### Limitations, Remaining Work, and Open Questions
+
+The authority for prospective relicensing follows the requested governance
+decision and was not independently verified with external legal records.
+The repository has no lockfile, so transitive dependencies can still drift.
+npm reports 17 vulnerabilities in the installed dependency tree; resolving
+them safely requires a dedicated dependency upgrade and compatibility review.
+Existing extension tests remain minimal and do not characterize deployment,
+packaging, or project-creation behavior.
+
+### Possible Article Angles
+
+- For maintainers of older extensions: "Separating a license transition from
+  compatibility fixes" explains how small, logical commits preserve legal and
+  technical reviewability.
+- For extension-tooling maintainers: "Why VS Code integration tests started
+  Node instead of Electron" shows how inherited host environment variables can
+  change a child process's execution mode.
+- For open-source maintainers: "Turning repository governance into a test"
+  shows a dependency-light approach to validating headers and attribution.
+
+### Suggested Narrative
+
+Start with a legacy extension whose legal metadata and tooling have drifted.
+Explain the constraint that historical MIT work must remain truthful. Introduce
+the governance baseline and its validator, then show the unexpected type and
+Electron-launch failures discovered only through real verification. Conclude
+with the isolated fixes, passing checks, and the remaining dependency-security
+work.
+
+### Claims Requiring Human Review
+
+The stated ownership periods, prospective relicensing authority, historical
+contributor identities, and sole-maintainer status are externally visible and
+should receive legal and maintainer review before publication or release.
 
 ## Context and Orientation
 
@@ -643,28 +783,32 @@ The plan is complete only when all applicable conditions are observable:
 
 ## Final Review Checklist
 
-- [ ] Existing repository instructions were read and followed.
-- [ ] No Git history was rewritten.
-- [ ] Apache-2.0 license text is complete and authoritative.
-- [ ] Historical MIT licensing is accurately documented.
-- [ ] The obsolete former project contact address has been removed or each retained occurrence is justified.
-- [ ] Italo Yeltsin is credited as original creator.
-- [ ] Fabio Sobral is the sole current maintainer.
-- [ ] Historical contributors are preserved.
-- [ ] TotalCross 2020–2021 headers retain MIT where applicable.
-- [ ] Amalgam 2022–2026 headers use Apache-2.0 where applicable.
-- [ ] Mixed-history files were reviewed individually.
-- [ ] Third-party notices were not overwritten.
-- [ ] Generated files were updated through generators where possible.
-- [ ] `AGENTS.md` exists and is repository-specific.
-- [ ] `.agent/PLANS.md` exists and is referenced consistently.
-- [ ] Validator tests pass.
-- [ ] CI invokes the same validator command documented locally.
-- [ ] The first commit contains governance only, including required header changes.
-- [ ] Refactoring began only after the governance commit.
-- [ ] Each refactoring commit has one coherent purpose.
-- [ ] Public API and compatibility impacts are documented.
-- [ ] Full final build/tests pass or known failures are recorded.
-- [ ] `git diff --check` passes.
-- [ ] Working tree is clean.
-- [ ] `Outcomes & Retrospective` is complete.
+- [x] Existing repository instructions were read and followed.
+- [x] No Git history was rewritten.
+- [x] Apache-2.0 license text is complete and authoritative.
+- [x] Historical MIT licensing is accurately documented.
+- [x] The obsolete former project contact address has been removed; no current-content occurrence remains.
+- [x] Italo Yeltsin is credited as original creator.
+- [x] Fabio Sobral is the sole current maintainer.
+- [x] Historical contributors are preserved.
+- [x] TotalCross 2020–2021 headers retain MIT where applicable.
+- [x] Amalgam 2022–2026 headers use Apache-2.0 where applicable.
+- [x] Mixed-history files were reviewed; no production mixed file requires a combined header.
+- [x] Third-party notices were not overwritten.
+- [x] Generated files were left intact; no generator update was necessary.
+- [x] `AGENTS.md` exists and is repository-specific.
+- [x] `.agent/PLANS.md` exists and is referenced consistently.
+- [x] Validator tests pass.
+- [x] CI invokes the same validator command documented locally.
+- [x] The first commit contains governance only, including required header changes.
+- [x] Refactoring began only after the governance commit.
+- [x] Each refactoring commit has one coherent purpose.
+- [x] Public API and compatibility impacts are documented.
+- [x] Full final build/tests pass.
+- [x] `git diff --check` passes.
+- [x] Working tree is clean after this plan-record commit.
+- [x] `Outcomes & Retrospective` is complete.
+
+Revision note (2026-07-15): recorded the completed governance transition,
+dependency and test-runner compatibility refactorings, observed validation
+results, remaining dependency-security work, and the final Editorial Report.
