@@ -57,7 +57,9 @@ The plan must not claim that code originally distributed under MIT retroactively
 - [x] (2026-07-15) Recorded the build dependency refactoring group before changing it.
 - [x] (2026-07-15) Implemented the build dependency refactoring by pinning `@types/vscode` to 1.40.0; `npm run compile`, governance validation, and 14 governance unit tests pass.
 - [x] (2026-07-15) Ran focused validation for the build dependency refactoring; no source or public API behavior changed.
-- [x] (2026-07-15) Ran the full supported `npm test` suite successfully after recompilation; it downloaded and launched VS Code 1.129.0 through `vscode-test`.
+- [x] (2026-07-15) Ran the full supported `npm test` suite after recompilation; the deprecated `vscode-test` wrapper downloaded VS Code 1.129.0 but failed to launch it on macOS with unsupported Electron option errors.
+- [x] (2026-07-15) Recorded a second build/test tooling refactoring group before changing it: replace the deprecated wrapper with its maintained `@vscode/test-electron` successor.
+- [x] (2026-07-15) Implemented and validated the test tooling refactoring: `npm test` launches VS Code 1.129.0 and reports two passing extension tests after clearing the inherited Electron Node-mode marker.
 - [ ] Review the final commit sequence for accidental mixing of governance and implementation work.
 - [ ] Complete `Outcomes & Retrospective` with counts, commands, commit hashes, exceptions, and follow-up items.
 
@@ -85,6 +87,15 @@ Do not silently resolve legal, attribution, or historical ambiguity. Record the 
 
 - Observation: A clean dependency install resolves `@types/vscode` beyond the syntax understood by the pinned TypeScript 3.6.4 compiler, so `npm run compile` fails before compiling this repository's source.
   Evidence: `npm install --ignore-scripts --no-package-lock && npm run compile` reports syntax errors in `node_modules/@types/vscode/index.d.ts`; governance validation and its 14 unit tests pass.
+
+- Observation: The deprecated `vscode-test` package cannot launch the latest downloaded VS Code on macOS; the process reports `bad option: --no-sandbox` and exits with code 9.
+  Evidence: The second final `npm test` attempt reused VS Code 1.129.0 and failed from `src/test/runTest.ts` before the extension test suite could run.
+
+- Observation: `@vscode/test-electron` 3.0.0 supports the active Node.js runtime but exposes declaration syntax incompatible with the project's TypeScript 3.9 compiler.
+  Evidence: A clean install followed by compilation reports `Type 'Buffer' is not generic` in `@vscode/test-electron/out/util.d.ts`.
+
+- Observation: The Electron launch errors are caused by the inherited `ELECTRON_RUN_AS_NODE=1` environment variable, not by the downloaded VS Code application.
+  Evidence: The active extension-host environment contains that variable; Electron reports Node-style `bad option` errors for the VS Code launch arguments. Removing it before `runTests` lets Electron launch as the VS Code application.
 
 ## Decision Log
 
@@ -165,6 +176,22 @@ Do not silently resolve legal, attribution, or historical ambiguity. Record the 
 
 - Decision: Pin `@types/vscode` to `1.40.0` in a standalone `refactor(build)` commit, while retaining the established TypeScript `^3.6.4` range.
   Rationale: The extension declares VS Code engine `^1.40.0`; the old caret on its corresponding type definitions resolved to 1.125.0, whose declarations cannot be parsed by the resolved TypeScript 3.9.10 compiler. The exact historical API type package restores a reproducible compatible bound without changing runtime dependencies or extension behavior.
+  Date: 2026-07-15
+
+- Decision: Replace deprecated `vscode-test` with `@vscode/test-electron` in a separate `refactor(test)` commit.
+  Rationale: npm marks `vscode-test` as renamed, and its current resolved wrapper cannot launch VS Code 1.129.0 in this macOS environment. The maintained successor provides the same `runTests` API used by `src/test/runTest.ts` and supports the active Node.js runtime.
+  Date: 2026-07-15
+
+- Decision: Use the maintained `@vscode/test-electron` 2.5 release line rather than 3.0.0.
+  Rationale: Version 3.0.0 requires a newer TypeScript declaration environment than this extension's compiler; the current 2.5 line supports Node.js 16 or later while avoiding that compiler incompatibility. The range keeps compatible maintenance updates within the selected major version.
+  Date: 2026-07-15
+
+- Decision: Delete `ELECTRON_RUN_AS_NODE` in `src/test/runTest.ts` before launching integration tests.
+  Rationale: This environment marker is correct for the host process that starts Codex but incorrect for the child VS Code application. The test script is the narrowest boundary at which to prevent the inheritance without changing user runtime behavior.
+  Date: 2026-07-15
+
+- Decision: Keep the historical MIT header on `src/test/runTest.ts` after the narrow test-runner changes.
+  Rationale: The file remains predominately 2019 TotalCross work; the import and environment sanitization are a minimal compatibility adjustment. The validator records it as historical work and preserves the existing MIT notice rather than asserting an unsupported whole-file relicensing.
   Date: 2026-07-15
 
 ## Outcomes & Retrospective

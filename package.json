@@ -63,7 +63,7 @@
 		"mocha": "^6.2.2",
 		"typescript": "^3.6.4",
 		"tslint": "^5.20.0",
-		"vscode-test": "^1.2.2"
+		"@vscode/test-electron": "^2.5.2"
 	},
 	"dependencies": {
 		"child_process": "^1.0.2",
