@@ -15,7 +15,8 @@ The TypeScript extension is in `src/`; historical project templates are in
 `resources/`. Use `npm run compile` to type-check and compile, `npm test` for
 the VS Code integration suite, `python3 tools/check-repository-governance.py`
 for repository governance checks, and `python3 -m unittest
-tests.test_repository_governance` for the validator tests. Prefer focused
+tests.test_repository_governance` for the validator tests. Use `npm run audit`
+to verify the committed dependency graph. Prefer focused
 checks first and keep verbose output in a log when useful.
 
 Preserve historical TotalCross MIT notices and all third-party, generated, and

@@ -7,7 +7,6 @@ import * as vscode from 'vscode';
 import * as util from './util';
 import { pathToFileURL } from 'url';
 const fs = require('fs-extra');
-const request = require('request-promise');
 const jsonfile = require('jsonfile');
 
 
@@ -75,4 +74,3 @@ export class ConfigChecker {
         return jsonfile.writeFileSync(this.path, data);
     }
 }
-
