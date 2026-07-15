@@ -1,3 +1,8 @@
+/*
+ * Copyright (C) 2020-2021 TotalCross Global Mobile Platform Ltda.
+ * SPDX-License-Identifier: MIT
+ */
+
 import * as vscode from 'vscode';
 import * as util from './util';
 import { pathToFileURL } from 'url';
@@ -70,5 +75,4 @@ export class ConfigChecker {
         return jsonfile.writeFileSync(this.path, data);
     }
 }
-
 

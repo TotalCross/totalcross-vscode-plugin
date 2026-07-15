@@ -1,3 +1,8 @@
+/*
+ * Copyright (C) 2020-2021 TotalCross Global Mobile Platform Ltda.
+ * SPDX-License-Identifier: MIT
+ */
+
 import * as assert from 'assert';
 
 // You can import and use all API from the 'vscode' module
@@ -13,4 +18,3 @@ suite('Extension Test Suite', () => {
 		assert.equal(-1, [1, 2, 3].indexOf(0));
 	});
 });
-

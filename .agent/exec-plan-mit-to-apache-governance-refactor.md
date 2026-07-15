@@ -1,0 +1,639 @@
+<!--
+Copyright (C) 2022-2026 Amalgam Solucoes em TI Ltda.
+SPDX-License-Identifier: Apache-2.0
+-->
+
+# Migrate project governance from MIT to Apache-2.0, correct authorship and maintenance attribution, then refactor in logical commits
+
+This ExecPlan is a living document. The sections `Progress`, `Surprises & Discoveries`, `Decision Log`, and `Outcomes & Retrospective` must be kept up to date as work proceeds.
+
+This plan must be maintained in accordance with the repository's `.agent/PLANS.md`. If that file does not yet exist, create it in the first governance commit using the current OpenAI Codex ExecPlan conventions, and use this document as the initial plan executed under those rules.
+
+## Purpose / Big Picture
+
+The project currently uses the MIT license and contains historical authorship, maintenance, copyright, and contact information that must be updated without erasing legitimate historical attribution.
+
+The work has two deliberately separate phases:
+
+1. create one governance commit that changes the project license prospectively from MIT to Apache License 2.0, corrects repository-level authorship and maintenance metadata, removes the obsolete former project contact address, adds agent instructions and planning conventions, introduces deterministic validators, and normalizes first-party source headers according to the ownership period of each file;
+2. after the governance baseline is complete and validated, inspect the implementation and perform justified refactoring and reorganization, committing those changes in small, coherent, independently reviewable groups.
+
+After the first commit:
+
+- the repository license for new and modified project work is identified by `SPDX-License-Identifier: Apache-2.0`;
+- the original project is credited to Italo Yeltsin (`@ItaloYeltsin`);
+- Fabio Sobral (`@flsobral`) is identified as the sole current maintainer;
+- previously credited people remain visible in a historical contributors section, without being presented as current maintainers;
+- all occurrences of the obsolete former project contact address are removed from first-party project content and metadata where removal is legally and technically appropriate;
+- source files attributable to the original 2020–2021 TotalCross period retain that historical ownership and MIT licensing information;
+- source files attributable to the 2022–2026 Amalgam period use Amalgam copyright and Apache-2.0 licensing information;
+- third-party, vendored, generated, imported, or separately licensed files retain their authoritative notices;
+- repository documentation explains the license transition and the distinction between original creation, historical contribution, present maintenance, and copyright ownership;
+- contributors and agents can run one concise validation command locally, and CI runs the same checks;
+- `AGENTS.md` and `.agent/PLANS.md` define how coding agents must inspect, edit, validate, and commit changes in this repository.
+
+The plan must not claim that code originally distributed under MIT retroactively became Apache-2.0. The repository-level transition is prospective from the governance commit onward. Historical MIT notices must remain accurate where they apply.
+
+## Progress
+
+- [x] (2026-07-15) Read `.agent/PLANS.md` and this ExecPlan; no pre-existing `AGENTS.md`, contributor guide, or nested instruction file was tracked.
+- [x] (2026-07-15) Inspected local and remote Git history, `master`, tags, working tree, and commit conventions without rewriting history.
+- [x] (2026-07-15) Inventoried licensing, attribution, contact, source, build, and CI files.
+- [x] (2026-07-15) Searched the obsolete contact, attribution names, contributors, and license notices; the only current-content occurrence was in `README.md`, while historical Git metadata remains unchanged.
+- [x] (2026-07-15) Classified all `src/` and first-party `resources/` source/templates as historical MIT work; `resources/maven-metadata.xml` as generated; documentation/configuration/assets as metadata or excluded; and new governance tooling as Amalgam Apache-2.0 work. No mixed-history production file was found.
+- [x] (2026-07-15) Recorded historical contributors evidenced by Git or the previous README: Allan C, lucasgalvanini, Ricardo Braga, and @nmarquesin.
+- [x] (2026-07-15) Applied the requested prospective Apache-2.0 transition only to current/new work; Git history contains no Amalgam-era source modification that would require a mixed header.
+- [x] (2026-07-15) Defined and implemented canonical C-style, hash-style, XML, and shebang-preserving header validation.
+- [x] (2026-07-15) Created `AGENTS.md` and adopted the existing untracked `.agent/PLANS.md` as the repository planning convention.
+- [x] (2026-07-15) Updated `LICENSE`, `NOTICE`, `README.md`, `AUTHORS.md`, `CONTRIBUTING.md`, and `.github/CODEOWNERS`.
+- [x] (2026-07-15) Implemented `tools/check-repository-governance.py` with deterministic Git-based path handling and concise sorted diagnostics.
+- [x] (2026-07-15) Added 14 focused `unittest` cases, including headers, provenance exceptions, attribution, ordering, whitespace paths, shebangs, and XML declarations.
+- [x] (2026-07-15) Added `.github/workflows/governance-validation.yml` invoking the documented validator and test commands.
+- [x] (2026-07-15) Added historical MIT headers to 21 applicable `src/`, `resources/`, and shell files; generated Maven metadata remains untouched.
+- [x] (2026-07-15) Reviewed the governance diff; it contains attribution, licensing, planning, validation, CI, and header changes only.
+- [ ] Create the first governance commit.
+- [ ] Run the complete validation and focused build/test suite from the governance commit.
+- [ ] Inspect architecture, packages, modules, dependencies, naming, duplicated code, dead code, build structure, tests, and public APIs for refactoring opportunities.
+- [ ] Write proposed refactoring groups in `Decision Log` before changing code.
+- [ ] Implement refactoring in logical, independently buildable commits.
+- [ ] After each refactoring commit, run the smallest sufficient validation set and record meaningful findings.
+- [ ] Run the full supported build and test suite after the final refactoring commit.
+- [ ] Review the final commit sequence for accidental mixing of governance and implementation work.
+- [ ] Complete `Outcomes & Retrospective` with counts, commands, commit hashes, exceptions, and follow-up items.
+
+## Surprises & Discoveries
+
+Record repository-specific findings here as work proceeds.
+
+Important examples include:
+
+- a file includes contributions from both licensing periods and cannot be classified from its current header alone;
+- Git history contradicts the year or owner written in a header;
+- the MIT license text grants permissions that must remain available for historical releases;
+- Apache relicensing authority is incomplete or unclear for some contributor-owned code;
+- an email address occurs in a historical artifact, test fixture, patch, vendored file, or signed metadata where removing it would alter authoritative third-party or historical material;
+- contributor names appear only in Git history and not in repository documentation;
+- generated sources are checked in and require changes to their generator instead of direct edits;
+- source files have mandatory first lines such as shebangs, XML declarations, encoding declarations, or generated markers;
+- a refactor that appears cosmetic changes public API, binary compatibility, serialization, package names, resource paths, or platform behavior;
+- tests are missing for code that should be reorganized, requiring characterization tests before structural changes.
+
+Do not silently resolve legal, attribution, or historical ambiguity. Record the evidence, the chosen treatment, and any limitation.
+
+- Observation: All version-controlled production source and first-party templates have a first or last substantive Git change dated 2019-2021; the only post-2021 commit changes `CHANGELOG.md`.
+  Evidence: Per-file `git log --follow` inventory and `git log --all` show no source created or materially changed in the requested 2022-2026 Amalgam period.
+
+- Observation: A clean dependency install resolves `@types/vscode` beyond the syntax understood by the pinned TypeScript 3.6.4 compiler, so `npm run compile` fails before compiling this repository's source.
+  Evidence: `npm install --ignore-scripts --no-package-lock && npm run compile` reports syntax errors in `node_modules/@types/vscode/index.d.ts`; governance validation and its 14 unit tests pass.
+
+## Decision Log
+
+- Decision: Change the repository's current license from MIT to Apache License 2.0 prospectively from the governance commit onward.
+  Rationale: The requested future project license is Apache-2.0, but code and releases previously distributed under MIT remain available under the permissions already granted by MIT.
+  Date: 2026-07-15
+
+- Decision: Use the exact SPDX identifier:
+
+      SPDX-License-Identifier: Apache-2.0
+
+  Rationale: `Apache-2.0` is the canonical SPDX identifier for Apache License 2.0.
+  Date: 2026-07-15
+
+- Decision: Attribute original project creation to Italo Yeltsin (`@ItaloYeltsin`).
+  Rationale: Original creation must remain visible and must not be conflated with present maintenance or current copyright ownership.
+  Date: 2026-07-15
+
+- Decision: Identify Fabio Sobral (`@flsobral`) as the sole current maintainer.
+  Rationale: Current repository responsibility should be unambiguous in the README, authorship documentation, CODEOWNERS, and agent instructions.
+  Date: 2026-07-15
+
+- Decision: Preserve all previously named people in a historical contributors list unless repository evidence shows that a name is erroneous or belongs to an unrelated third party.
+  Rationale: Updating maintenance must not erase legitimate historical contribution.
+  Date: 2026-07-15
+
+- Decision: Remove the obsolete former project contact address from first-party repository content and metadata.
+  Rationale: The email address is obsolete and must no longer be published as a project contact. Historical Git commit metadata must not be rewritten unless separately authorized.
+  Date: 2026-07-15
+
+- Decision: Do not rewrite Git history as part of this plan.
+  Rationale: The requested changes can be represented truthfully in a new governance commit. Existing commit authors, signed commits, tags, and released history must remain intact.
+  Date: 2026-07-15
+
+- Decision: Use period-specific legal headers rather than replacing every historical notice with a single current notice.
+  Rationale: Copyright ownership and licensing must reflect the period and provenance of the work.
+  Date: 2026-07-15
+
+- Decision: Use the following canonical historical classification when supported by repository evidence:
+
+      Copyright (C) 2020-2021 TotalCross Global Mobile Platform Ltda.
+      SPDX-License-Identifier: MIT
+
+  Rationale: This preserves the requested ownership and MIT licensing for original-period files.
+  Date: 2026-07-15
+
+- Decision: Use the following canonical current-period classification when supported by repository evidence:
+
+      Copyright (C) 2022-2026 Amalgam Solucoes em TI Ltda.
+      SPDX-License-Identifier: Apache-2.0
+
+  Rationale: This identifies Amalgam ownership and Apache-2.0 licensing for the requested later period.
+  Date: 2026-07-15
+
+- Decision: Mixed-history files require evidence-based treatment and may include more than one copyright line.
+  Rationale: A file substantially originating in 2020–2021 and later modified in 2022–2026 may legitimately need both ownership statements. Do not erase the earlier owner merely because the current repository license changed.
+  Date: 2026-07-15
+
+- Decision: The first commit contains governance, licensing, attribution, validators, README, agent instructions, planning conventions, and all required header normalization, but no unrelated refactoring.
+  Rationale: This creates a clear legal and operational baseline that can be reviewed independently from implementation changes.
+  Date: 2026-07-15
+
+- Decision: Refactoring begins only after the governance commit passes validation.
+  Rationale: Structural code changes should not obscure or complicate review of relicensing and attribution changes.
+  Date: 2026-07-15
+
+- Decision: Refactoring commits must be grouped by a single coherent purpose and remain buildable whenever practical.
+  Rationale: Logical commits improve review, bisectability, rollback, and future maintenance.
+  Date: 2026-07-15
+
+- Decision: Treat the generated `resources/maven-metadata.xml`, the VS Code quickstart scaffold, binary assets, and legacy modernization ignore file as explicit validator exclusions; validate headers only on executable first-party source/templates and newly added governance tooling.
+  Rationale: These paths either have authoritative generated/scaffold content or cannot carry a syntactically safe file header. The validator still scans all eligible current text for the obsolete contact address.
+  Date: 2026-07-15
+
+- Decision: Defer the TypeScript/@types VS Code compatibility repair to a post-governance build refactoring commit.
+  Rationale: The failure is pre-existing dependency-resolution drift caused by the unpinned development dependency range, not a licensing or attribution change. Keeping it separate preserves the reviewable governance baseline.
+  Date: 2026-07-15
+
+## Outcomes & Retrospective
+
+Complete this section after implementation.
+
+Include:
+
+- repository and branch inspected;
+- whether remote history was preserved unchanged;
+- previous authoritative license files found;
+- exact license transition wording added;
+- number of occurrences of the obsolete former project contact address found, removed, excluded, and why;
+- all people listed as historical contributors before and after the change;
+- files identifying Italo Yeltsin as original creator;
+- files identifying Fabio Sobral as sole maintainer;
+- number of files classified as historical MIT, Amalgam Apache-2.0, mixed history, third-party, generated, or unresolved;
+- number of headers changed in each category;
+- validator commands and CI workflow names;
+- governance commit hash and message;
+- refactoring opportunities considered and rejected;
+- refactoring commits created, with purpose and validation performed for each;
+- public API or compatibility impacts;
+- remaining legal, technical, or documentation follow-ups.
+
+## Context and Orientation
+
+Start by locating repository instructions and understanding the current state:
+
+    pwd
+    git rev-parse --show-toplevel
+    git status --short --branch
+    git remote -v
+    git log --oneline --decorate --graph --all --max-count=80
+    git tag --list --sort=-creatordate | sed -n '1,80p'
+    find .. \( -name AGENTS.md -o -name PLANS.md -o -path '*/.agent/PLANS.md' -o -path '*/.agents/PLANS.md' \) -print
+
+Read all applicable instruction files before editing.
+
+Inventory the repository without traversing generated dependency trees:
+
+    find . -maxdepth 5 -type f \
+      ! -path './.git/*' \
+      ! -path './build/*' \
+      ! -path './dist/*' \
+      ! -path './out/*' \
+      ! -path './target/*' \
+      ! -path './node_modules/*' \
+      | sort | sed -n '1,500p'
+
+Inspect legal, attribution, and contact information:
+
+    git grep -n -I -E \
+      'br\.yeltsin@gmail\.com|Italo Yeltsin|ItaloYeltsin|Fabio Sobral|flsobral|Copyright|SPDX-License-Identifier|SPDX-FileCopyrightText|MIT License|Apache License|maintainer|author|contributor' \
+      -- . \
+      ':(exclude)build/**' \
+      ':(exclude)dist/**' \
+      ':(exclude)out/**' \
+      ':(exclude)target/**' \
+      ':(exclude)node_modules/**' \
+      || true
+
+Inspect authorship evidence from Git without rewriting it:
+
+    git shortlog -sne --all
+    git log --format='%aN <%aE>' --all | sort -fu
+    git log --format='%cN <%cE>' --all | sort -fu
+    git log --follow --format='%h %ad %an <%ae> %s' --date=short -- path/to/important/file
+
+Use `git blame`, `git log --follow`, release tags, imported-source records, and existing notices to classify ambiguous files. Do not infer ownership solely from the most recent editor.
+
+Inspect build and test entry points:
+
+    find . -maxdepth 4 -type f \( \
+      -name 'build.gradle' -o \
+      -name 'build.gradle.kts' -o \
+      -name 'settings.gradle' -o \
+      -name 'settings.gradle.kts' -o \
+      -name 'gradlew' -o \
+      -name 'pom.xml' -o \
+      -name 'CMakeLists.txt' -o \
+      -name 'Makefile' -o \
+      -name 'package.json' -o \
+      -name 'Cargo.toml' \
+    \) -print | sort
+
+## License Transition Rules
+
+### Repository license files
+
+Replace the current top-level MIT license file with the complete Apache License 2.0 text in `LICENSE` or the repository's established license filename.
+
+Add `NOTICE` when appropriate. At minimum it should identify:
+
+- the current project name;
+- original project creation by Italo Yeltsin (`@ItaloYeltsin`);
+- current maintenance by Fabio Sobral (`@flsobral`);
+- the historical MIT licensing period where applicable;
+- Amalgam Solucoes em TI Ltda. as the 2022–2026 copyright holder where applicable;
+- preservation of third-party notices.
+
+Do not place terms in `NOTICE` that contradict Apache-2.0 or attempt to revoke historical MIT permissions.
+
+Document the transition in README or a dedicated licensing section with wording equivalent to:
+
+    Versions and source distributions released before this license transition may
+    remain available under the MIT License terms that accompanied them. From this
+    governance change onward, project work controlled by the current copyright
+    holder is licensed under the Apache License, Version 2.0, unless a file states
+    otherwise.
+
+Adapt wording to verified repository history and release facts.
+
+### Canonical file-header categories
+
+Prefer SPDX metadata, but retain requested human-readable copyright lines when they are part of the project's established header format.
+
+#### Historical TotalCross files
+
+For a file whose controlled first-party content belongs only to the 2020–2021 period:
+
+    Copyright (C) 2020-2021 TotalCross Global Mobile Platform Ltda.
+    SPDX-License-Identifier: MIT
+
+Do not change it to Apache-2.0 merely because the repository's current license changed.
+
+#### Amalgam files
+
+For a file created entirely in the 2022–2026 Amalgam period, or for a new file added by this work:
+
+    Copyright (C) 2022-2026 Amalgam Solucoes em TI Ltda.
+    SPDX-License-Identifier: Apache-2.0
+
+For a file first created in a later year, do not invent 2022 unless the project explicitly requires a common range. Record and follow the repository's legal convention.
+
+#### Mixed-history files
+
+For files containing material from both periods, use both copyright statements when supported:
+
+    Copyright (C) 2020-2021 TotalCross Global Mobile Platform Ltda.
+    Copyright (C) 2022-2026 Amalgam Solucoes em TI Ltda.
+    SPDX-License-Identifier: Apache-2.0
+
+Before applying Apache-2.0 to the combined current file, confirm that the relevant rights holder is authorized to relicense the inherited MIT code and that no contributor-specific restriction prevents it. MIT permits redistribution under additional terms provided its notice is preserved, but the original MIT notice and disclaimer must remain available where legally required. Record the chosen representation in `Decision Log`.
+
+If the safest accurate treatment is dual licensing or preserving an MIT identifier for a particular file, do not force Apache-2.0. Record the exception.
+
+#### Third-party and generated files
+
+Do not replace, remove, or normalize third-party notices. Do not manually edit generated files when the generator can be changed instead.
+
+### Comment syntax
+
+Preserve shebangs, XML declarations, encoding declarations, and generated markers.
+
+C-style example:
+
+    /*
+     * Copyright (C) 2022-2026 Amalgam Solucoes em TI Ltda.
+     * SPDX-License-Identifier: Apache-2.0
+     */
+
+Hash-comment example:
+
+    # Copyright (C) 2022-2026 Amalgam Solucoes em TI Ltda.
+    # SPDX-License-Identifier: Apache-2.0
+
+XML example:
+
+    <!--
+      Copyright (C) 2022-2026 Amalgam Solucoes em TI Ltda.
+      SPDX-License-Identifier: Apache-2.0
+    -->
+
+## Attribution and Governance Files
+
+### `README.md`
+
+Update the README to include concise, visible sections covering:
+
+- project purpose and supported use;
+- license and transition note;
+- original creator: Italo Yeltsin (`@ItaloYeltsin`);
+- sole maintainer: Fabio Sobral (`@flsobral`);
+- link to `AUTHORS.md` or contributors documentation;
+- local build, test, and validation commands;
+- contribution entry point.
+
+Remove the obsolete former project contact address. Do not replace it with another email unless explicitly requested.
+
+### `AUTHORS.md`
+
+Create or update with a structure similar to:
+
+    # Authors and contributors
+
+    ## Original creator
+
+    Italo Yeltsin ([@ItaloYeltsin](https://github.com/ItaloYeltsin))
+
+    ## Current maintainer
+
+    Fabio Sobral ([@flsobral](https://github.com/flsobral))
+
+    Fabio Sobral is the sole current maintainer.
+
+    ## Historical contributors
+
+    - <preserved names discovered in the repository>
+
+    Additional contributors are recorded in Git history.
+
+    ## Copyright history
+
+    - 2020-2021: TotalCross Global Mobile Platform Ltda., for applicable original work.
+    - 2022-2026: Amalgam Solucoes em TI Ltda., for applicable later work.
+
+Do not invent contributor names. Deduplicate spelling variants only after checking Git history and repository evidence.
+
+### `.github/CODEOWNERS`
+
+Set Fabio Sobral as the default current code owner:
+
+    * @flsobral
+
+Preserve valid path-specific rules if they still reflect active ownership. Remove obsolete rules that designate former maintainers only after recording the change.
+
+### `CONTRIBUTING.md`
+
+Document:
+
+- the current Apache-2.0 contribution license expectation;
+- the historical-license exception policy;
+- required headers for new first-party files;
+- prohibition against changing third-party notices;
+- the local validation command;
+- build and test commands;
+- commit expectations for coherent changes;
+- how to update generated files and their generators;
+- that Fabio Sobral is the sole current maintainer and reviewer of record.
+
+Do not assert copyright assignment or a contributor license agreement unless one actually exists.
+
+### `AGENTS.md`
+
+Create a repository-root `AGENTS.md` that tells coding agents to:
+
+- read `AGENTS.md` and `.agent/PLANS.md` before modifying files;
+- inspect Git status and repository instructions first;
+- preserve historical copyright and third-party notices;
+- never reintroduce the obsolete former project contact address;
+- use Apache-2.0 headers for new first-party files unless a documented exception applies;
+- avoid broad formatting or refactoring in governance-only changes;
+- keep commits logical, buildable, and narrowly described;
+- prefer focused validation before expensive full builds;
+- keep build output concise and save verbose logs to files when useful;
+- update an active ExecPlan while performing long or multi-step work;
+- avoid rewriting history, force-pushing, deleting tags, or changing release artifacts without explicit authorization;
+- report unresolved licensing or provenance ambiguity instead of guessing.
+
+Include repository-specific build, test, formatting, and validation commands discovered during inspection.
+
+### `.agent/PLANS.md`
+
+Create `.agent/PLANS.md` defining the required structure and maintenance rules for Codex ExecPlans in this repository.
+
+It must require at least:
+
+- `Purpose / Big Picture`;
+- `Progress` with timestamped checkboxes when useful;
+- `Surprises & Discoveries`;
+- `Decision Log`;
+- `Outcomes & Retrospective`;
+- concrete file paths and commands;
+- observable acceptance criteria;
+- continuous updates during execution;
+- explicit documentation of deviations and unresolved risks.
+
+Use `.agent/PLANS.md` exactly as requested. Do not silently substitute `.agents/PLANS.md`; if an existing convention uses the plural directory, document the conflict and either migrate references consistently or preserve a compatibility pointer.
+
+## Validation Tooling
+
+Implement a deterministic, dependency-light validator in the repository's existing scripting language where practical.
+
+It must:
+
+1. enumerate tracked candidate files using Git, preferably `git ls-files -z`;
+2. classify paths through explicit inclusion and exclusion rules;
+3. validate expected copyright and SPDX combinations;
+4. reject `SPDX-License-Identifier: MIT` for new Amalgam-era first-party files unless explicitly excepted;
+5. reject removal of required historical MIT notices from classified historical files;
+6. reject the obsolete former project contact address in first-party tracked content;
+7. verify README, AUTHORS, CODEOWNERS, AGENTS, and `.agent/PLANS.md` contain required current attribution;
+8. ensure Italo Yeltsin is identified as original creator, not current maintainer;
+9. ensure Fabio Sobral is identified as sole current maintainer;
+10. preserve an explicit allowlist for third-party, generated, fixtures, and unavoidable historical artifacts;
+11. print concise, sorted, path-based diagnostics;
+12. exit nonzero on failure;
+13. avoid modifying files;
+14. support paths containing spaces and non-ASCII characters.
+
+Suitable commands might be:
+
+    python3 tools/check-repository-governance.py
+    python3 -m unittest tests.test_repository_governance
+
+Use actual repository conventions and document the final commands in README, CONTRIBUTING, AGENTS, and CI.
+
+At minimum test:
+
+- valid historical MIT header;
+- valid Amalgam Apache-2.0 header;
+- valid mixed-history header;
+- missing historical notice;
+- incorrect owner/year combination;
+- obsolete email detection;
+- third-party exclusion;
+- generated-file exclusion;
+- Italo incorrectly marked as current maintainer;
+- Fabio missing as sole maintainer;
+- deterministic diagnostics;
+- path containing spaces;
+- shebang and XML declaration placement.
+
+## Required First Commit: Governance and License Transition
+
+The first commit must include all related governance changes and header normalization together, and must exclude unrelated implementation refactoring.
+
+Expected content includes, as applicable:
+
+    LICENSE
+    NOTICE
+    README.md
+    AUTHORS.md
+    CONTRIBUTING.md
+    AGENTS.md
+    .agent/PLANS.md
+    .github/CODEOWNERS
+    .github/workflows/<governance-validation>.yml
+    tools/<validator>
+    tests/<validator-tests-or-fixtures>
+    all applicable first-party files whose headers are normalized
+    project metadata files containing obsolete contact, authorship, maintainer, or license information
+
+Before staging, produce explicit inventories:
+
+    git grep -n -I 'br\.yeltsin@gmail\.com' -- . || true
+    git grep -n -I -E 'SPDX-License-Identifier: MIT|SPDX-License-Identifier: Apache-2.0' -- . || true
+    git status --short
+
+Stage deliberately. Review:
+
+    git diff --check
+    git diff --cached --stat
+    git diff --cached -- LICENSE NOTICE README.md AUTHORS.md CONTRIBUTING.md AGENTS.md .agent/PLANS.md .github tools tests
+    git diff --cached
+
+Run validators and focused build/tests before committing.
+
+Recommended commit message:
+
+    chore(governance): migrate project licensing to Apache-2.0
+
+The commit body should explain:
+
+- prospective MIT to Apache-2.0 transition;
+- preserved historical MIT attribution;
+- original creator and current maintainer roles;
+- obsolete email removal;
+- addition of validators, CI, AGENTS, and planning rules;
+- project-wide header normalization.
+
+Do not split this governance baseline into several commits unless a repository instruction explicitly requires it. Do not include code cleanup, renaming, package moves, formatting-only sweeps, behavior changes, or dependency upgrades unrelated to making the governance baseline valid.
+
+## Post-Governance Code Review
+
+After the first commit is complete, start from a clean working tree and inspect the code systematically.
+
+Review:
+
+- module and package boundaries;
+- source and test directory organization;
+- public API versus implementation details;
+- duplicated or dead code;
+- naming consistency;
+- dependency direction and cycles;
+- platform-specific code placement;
+- generated code and generators;
+- build scripts and dependency declarations;
+- error handling and resource lifecycle;
+- test coverage and testability;
+- unnecessary compatibility layers;
+- documentation that no longer matches behavior;
+- large files or classes with multiple responsibilities;
+- opportunities to separate reusable core logic from adapters or platform integrations.
+
+Use static tools already present in the repository. Do not add a major formatter, linter, dependency, or build system merely to perform cleanup unless the benefit is documented and separately reviewable.
+
+Before structural changes, add characterization tests when behavior is not adequately protected.
+
+## Logical Refactoring Commit Strategy
+
+Each refactoring commit must have one primary purpose. Examples, used only when supported by the actual project:
+
+1. `test(core): add characterization coverage for current behavior`
+2. `refactor(build): normalize source sets and generated outputs`
+3. `refactor(core): separate parsing from execution`
+4. `refactor(platform): isolate platform-specific adapters`
+5. `refactor(api): clarify internal and public package boundaries`
+6. `refactor(resources): centralize resource loading and cleanup`
+7. `docs(architecture): document the reorganized module structure`
+
+For every proposed group:
+
+- record the problem and evidence in `Decision Log`;
+- list exact files and expected behavioral impact;
+- identify compatibility risks;
+- run focused tests before and after;
+- avoid mixing formatting-only changes with semantic changes;
+- avoid moving and rewriting a file in the same commit when that would make review unnecessarily difficult;
+- update imports, build configuration, tests, and documentation in the same commit when required to keep the tree buildable;
+- use `git diff --check` and inspect the complete staged diff;
+- include the reason for the change in the commit body, not only a description of file movements.
+
+If no meaningful refactoring is justified, do not manufacture changes. Record that the review found no safe, valuable reorganization within scope.
+
+## Validation and Acceptance
+
+The plan is complete only when all applicable conditions are observable:
+
+- the current top-level license is Apache License 2.0;
+- historical MIT permissions and notices are not falsely revoked or erased;
+- the obsolete former project contact address is absent from first-party current repository content, subject to documented exclusions;
+- Italo Yeltsin is clearly identified as original creator;
+- Fabio Sobral is clearly identified as the sole current maintainer;
+- all previously credited legitimate people remain in a historical contributors list;
+- `.github/CODEOWNERS` identifies `@flsobral` as the default current owner;
+- `AGENTS.md` exists and contains repository-specific operational rules;
+- `.agent/PLANS.md` exists and defines ExecPlan requirements;
+- applicable source headers match their verified historical category;
+- third-party and generated notices remain intact;
+- validators pass locally and in CI;
+- README and CONTRIBUTING document the exact validation command;
+- the governance commit contains no unrelated refactoring;
+- each later refactoring commit is coherent, justified, and validated;
+- the final supported build and test suite passes, or every pre-existing failure is clearly distinguished from regressions introduced by this work;
+- the working tree is clean;
+- the final commit history is understandable without external explanation.
+
+## Final Review Checklist
+
+- [ ] Existing repository instructions were read and followed.
+- [ ] No Git history was rewritten.
+- [ ] Apache-2.0 license text is complete and authoritative.
+- [ ] Historical MIT licensing is accurately documented.
+- [ ] The obsolete former project contact address has been removed or each retained occurrence is justified.
+- [ ] Italo Yeltsin is credited as original creator.
+- [ ] Fabio Sobral is the sole current maintainer.
+- [ ] Historical contributors are preserved.
+- [ ] TotalCross 2020–2021 headers retain MIT where applicable.
+- [ ] Amalgam 2022–2026 headers use Apache-2.0 where applicable.
+- [ ] Mixed-history files were reviewed individually.
+- [ ] Third-party notices were not overwritten.
+- [ ] Generated files were updated through generators where possible.
+- [ ] `AGENTS.md` exists and is repository-specific.
+- [ ] `.agent/PLANS.md` exists and is referenced consistently.
+- [ ] Validator tests pass.
+- [ ] CI invokes the same validator command documented locally.
+- [ ] The first commit contains governance only, including required header changes.
+- [ ] Refactoring began only after the governance commit.
+- [ ] Each refactoring commit has one coherent purpose.
+- [ ] Public API and compatibility impacts are documented.
+- [ ] Full final build/tests pass or known failures are recorded.
+- [ ] `git diff --check` passes.
+- [ ] Working tree is clean.
+- [ ] `Outcomes & Retrospective` is complete.

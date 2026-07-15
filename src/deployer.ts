@@ -1,3 +1,8 @@
+/*
+ * Copyright (C) 2020-2021 TotalCross Global Mobile Platform Ltda.
+ * SPDX-License-Identifier: MIT
+ */
+
 import * as vscode from 'vscode';
 var node_ssh = require('node-ssh');
 var validators = require('./validators/deployer');
@@ -130,4 +135,3 @@ exports.deployAndRun = async function() {
           });
     }
 };
-

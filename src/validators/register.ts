@@ -1,3 +1,8 @@
+/*
+ * Copyright (C) 2020-2021 TotalCross Global Mobile Platform Ltda.
+ * SPDX-License-Identifier: MIT
+ */
+
 import { validatePassword } from "./login";
 
 export function validateNonEmpty(field: string) {
@@ -17,4 +22,4 @@ export function validateEmail(value: string) {
     return null;
 }
 
-exports.validatePassword = validatePassword; 
+exports.validatePassword = validatePassword;
