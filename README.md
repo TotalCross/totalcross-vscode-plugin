@@ -18,6 +18,7 @@ commands:
 - `TotalCross: Package`
 - `TotalCross: Deploy`
 - `TotalCross: Deploy&Run`
+- `TotalCross: Convert Maven Project to Gradle`
 
 New projects use the Gradle Wrapper included in the generated project, so a
 separate Gradle or Maven installation is not required. Package a project with
@@ -25,10 +26,35 @@ separate Gradle or Maven installation is not required. Package a project with
 
     ./gradlew totalcrossPackage
 
-On Windows, use `gradlew.bat totalcrossPackage`. Generated output is rooted at
-`build/totalcross`; Linux ARM packages are uploaded from
-`build/totalcross/install/linux_arm`. Existing Maven-only projects remain
+On Windows, use `gradlew.bat totalcrossPackage --console=plain`. Generated
+output is rooted at `build/totalcross`. Existing Maven-only projects remain
 supported and continue to package with `mvn package` and use `target/install`.
+
+## Migrating a Maven project
+
+When a workspace root contains a TotalCross `pom.xml` and no root Gradle build
+files, the extension asks in English whether to convert it. The only actions
+are `Convert Now` and `Remind Me Tomorrow`. Dismissing the notification has the
+same effect as the reminder action: that workspace is not prompted again for
+exactly 24 hours. Other workspace folders have independent reminders.
+
+`Convert Now` reads the TotalCross SDK and plugin configuration from the POM,
+creates a marked Groovy Gradle project and Wrapper, and runs `./gradlew tasks
+--console=plain`. The Java source tree is unchanged. The POM becomes
+`pom.xml.maven-backup` only after that validation succeeds. If the unpublished
+plugin is missing from Maven Local, the generated Gradle files and original POM
+remain so that publishing the plugin and retrying the command is safe.
+
+The conversion writes activation keys only to project-local `gradle.properties`,
+which it adds to `.gitignore`; it does not put the key in `build.gradle` or
+`.totalcross/project.json`. A root with unrelated Maven and Gradle files is
+deliberately not packaged or deployed automatically, because the extension
+cannot know which build is authoritative.
+
+For a project configured with the `linux_arm` platform, the Gradle plugin writes
+the SSH deployer's install directory beneath
+`build/totalcross/install/linux_arm`, so `TotalCross: Deploy` uses that output
+after packaging.
 
 ## Using the unpublished Gradle plugin locally
 

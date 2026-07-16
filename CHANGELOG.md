@@ -10,6 +10,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   The default unpublished plugin version must be installed with
   `publishToMavenLocal`; existing Maven-only workspaces remain supported for
   packaging and deployment.
+- Legacy TotalCross Maven projects can be converted through a one-day,
+  per-workspace Gradle migration reminder or the `TotalCross: Convert Maven
+  Project to Gradle` command. Conversion preserves the POM until Wrapper
+  validation succeeds, keeps activation keys out of build scripts and metadata,
+  and can be retried after the local Gradle plugin is published.
+- Gradle packaging uses the project Wrapper. Mixed Maven/Gradle roots require a
+  migration decision, while Gradle Linux ARM package output is deployed from
+  `build/totalcross/install/linux_arm`.
 
 ## [0.0.15] - 2021-04-27
 ### Changed

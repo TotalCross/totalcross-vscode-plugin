@@ -30,10 +30,10 @@ The feature is visible when a legacy TotalCross Maven project is opened in an Ex
 - [x] (2026-07-16 13:52Z) Added a reusable Gradle renderer that packages the existing Gradle 9.6.1 Wrapper resources and writes non-secret migration metadata.
 - [x] (2026-07-16 13:54Z) Implemented atomic Maven-to-Gradle conversion, post-validation POM backup, rollback, generated-build retry, and Maven-Local-missing retention behavior.
 - [x] (2026-07-16 13:56Z) Updated build-system detection and package routing so converted Gradle projects use their Wrapper while Maven projects remain supported and mixed roots require an explicit migration decision.
-- [ ] Add unit, migration-fixture, extension, and end-to-end validation.
-- [ ] Update user-facing documentation and changelog entries in English.
-- [ ] Record actual implementation evidence in `Outcomes & Retrospective`.
-- [ ] Finalize the `Editorial Report` from the completed implementation and validation evidence.
+- [x] (2026-07-16 14:00Z) Added focused classifier, reminder, model, renderer, transaction, and layout tests; ran compilation, the Extension Development Host test suite, governance checks, audit, VSIX inspection, local-plugin publication, and a clean conversion/package proof.
+- [x] (2026-07-16 14:00Z) Updated `README.md` and `CHANGELOG.md` in English with migration, recovery, security, packaging, and deployment behavior.
+- [x] (2026-07-16 14:00Z) Recorded final implementation and validation evidence in `Outcomes & Retrospective`.
+- [x] (2026-07-16 14:00Z) Finalized the `Editorial Report` from completed implementation and validation evidence.
 
 Use UTC timestamps on every progress update. Split partially completed work into explicit completed and remaining portions at every stopping point.
 
@@ -46,6 +46,12 @@ Record unexpected behavior, compatibility constraints, parser edge cases, VS Cod
 
 - Observation: The local plugin uses version `0.1.0-SNAPSHOT`, Gradle Wrapper `9.6.1`, and documents `build/totalcross` output.
   Evidence: `../totalcross-gradle-plugin/build.gradle`, `gradle/wrapper/gradle-wrapper.properties`, and `README.md` inspected on 2026-07-16.
+
+- Observation: The public TotalCross Maven repository did not resolve SDK `7.3.0` during a packaging proof, and a legacy SDK must compile with JDK 17 plus `options.release = 8`, not require a local JDK 8 toolchain.
+  Evidence: A converted temporary 7.3.0 fixture failed dependency resolution; a 7.2.2 fixture initially failed with `Cannot find a Java installation ... languageVersion=8`. Rendering was changed to use a JDK 17 toolchain while retaining Java 8 bytecode for old SDKs.
+
+- Observation: The Gradle plugin does produce the SSH deployer's Linux ARM install layout when `linux_arm` is selected.
+  Evidence: The successful 7.2.2 end-to-end run wrote `build/totalcross/install/linux_arm/MigrationDemo` and its `.tcz` dependencies.
 
 ## Decision Log
 
@@ -85,65 +91,71 @@ Record unexpected behavior, compatibility constraints, parser edge cases, VS Cod
   Rationale: This makes XML failure containment and the exact 86,400,000-millisecond boundary testable in the existing Mocha suite.
   Date/Author: 2026-07-16 / OpenAI
 
+- Decision: Always render a JDK 17 Gradle toolchain and express legacy SDK compatibility through `JavaCompile.options.release`.
+  Rationale: The checked-out generator already uses JDK 17, while SDK 7.2.2 rejected the unavailable local JDK 8 toolchain but packaged successfully when compiled to Java 8 bytecode on JDK 17.
+  Date/Author: 2026-07-16 / OpenAI
+
+- Decision: Retain Gradle SSH deployment using `build/totalcross/install/linux_arm`.
+  Rationale: The end-to-end `linux_arm` package confirmed that the plugin creates the same install directory shape expected by the existing deployer.
+  Date/Author: 2026-07-16 / OpenAI
+
 ## Outcomes & Retrospective
 
-The first milestone is complete: `src/migration/project-classifier.ts` recognizes only root TotalCross Maven POMs, and `src/migration/reminder-state.ts` persists an exact per-folder 24-hour deadline. `npm run compile` and `npm test` passed with 12 tests. Notification UI, conversion, packaging alignment, and end-to-end publication validation remain.
+All planned implementation milestones are complete. The extension now classifies eligible Maven roots, presents the exact two-action reminder, converts a selected folder transactionally, and packages/deploys converted Gradle projects through the established layout. The POM parser, renderer, transaction, reminder policy, and project-layout behaviors are covered by 20 extension tests.
 
-The second milestone is complete: `src/migration/migration-reminder.ts` presents the requested English prompt only once per activation and routes `Convert Now` using the selected folder URI. `package.json` exposes the retryable command. `npm run compile` and `npm test` passed with 14 tests.
-
-The third and fourth milestones are complete: `src/migration/maven-project.ts` normalizes supported POM values, and `src/migration/gradle-renderer.ts` builds Groovy Gradle files, wrapper resources, and `.totalcross/project.json` in memory. The renderer draws the wrapper from the pre-existing packaged `resources/gradle` tree, whose version is Gradle 9.6.1. `npm run compile` and `npm test` passed with 16 tests.
-
-The fifth milestone is complete: `src/migration/convert-project.ts` writes generated files through sibling temporary paths, merges a pre-existing `gradle.properties` conservatively, validates with an argument-array Wrapper invocation, and renames the POM only after success. It preserves generated files and the original POM if Maven Local lacks the plugin, but restores ordinary failures. `npm run compile` and `npm test` passed with 18 tests before the final missing-local-plugin regression was added.
-
-The sixth milestone is complete: `src/project-layout.ts` identifies mixed Maven/Gradle roots instead of guessing, while `src/packager.ts` uses the project Wrapper with `--console=plain` for Gradle-only projects and preserves Maven packaging. The SSH deployer now reports that Gradle's verified `.tcz` output is not an install directory, rather than attempting an invalid upload. `npm run compile` and `npm test` passed with 20 tests.
+The final validation observed `npm run compile`, `npm test` (20 passing), `npm run validate:governance`, `npm run test:governance` (17 tests), and `npm run audit` (0 vulnerabilities). The sibling plugin's `./gradlew clean test publishToMavenLocal --console=plain` completed successfully. A clean 7.2.2 Maven fixture was converted, preserved its POM as `pom.xml.maven-backup`, passed Wrapper validation, and completed `./gradlew clean totalcrossPackage --console=plain`, producing Linux ARM output under `build/totalcross/install/linux_arm`. `/private/tmp/totalcross-migration.vsix` included all Wrapper resources.
 
 ## Editorial Report
 
-This section is mandatory at completion. It must describe only observed results and remain synchronized with the final repository state.
+This report describes the completed repository state and only validation that was actually observed.
 
 ### Editorial Summary
 
-To be completed from implementation evidence.
+Legacy TotalCross Maven workspaces needed a safe path to the Gradle plugin without suddenly removing Maven support. The completed extension recognizes only root TotalCross Maven POMs, offers a two-button English migration reminder, and can retry a folder-specific conversion from the Command Palette.
+
+The conversion renders a Groovy Gradle project and Wrapper, validates the Wrapper before moving `pom.xml`, preserves source files, and protects activation keys. A clean SDK 7.2.2 fixture converted and ran `totalcrossPackage`, creating the expected Linux ARM install output.
 
 ### Original Plan versus Actual Outcome
 
-To be completed from implementation evidence.
+The original plan's notification, reminder, parsing, rendering, safe conversion, Maven compatibility, local plugin resolution, and VSIX-resource goals were implemented. The renderer was adjusted during execution: legacy SDKs compile on a JDK 17 toolchain with Java 8 bytecode rather than requiring JDK 8. The initial assumption that Gradle output was unsuitable for SSH deployment was rejected after a Linux ARM proof showed the expected install directory.
 
 ### What Changed
 
-To be completed with repository-relative paths, stable command names, templates, tests, and generated artifacts.
+`src/migration/` contains the classifier, reminder state/coordinator, POM model, renderer, and conversion transaction. `extension.convertMavenProjectToGradle` is contributed in `package.json` and registered by `src/extension.ts`. `src/project-layout.ts`, `src/packager.ts`, and `src/deployer.ts` distinguish Maven, Gradle, and mixed roots. `README.md` and `CHANGELOG.md` document the workflow. Existing `resources/gradle/` Wrapper assets are rendered into migrated projects and verified inside the VSIX.
 
 ### Decisions and Trade-offs
 
-To be completed from the final `Decision Log`, including reminder persistence, dismissal behavior, Maven compatibility, and local Gradle plugin resolution.
+Reminder deadlines are per workspace URI, and dismissal equals a 24-hour postponement. Generated builds resolve the unpublished plugin from Maven Local and retain an incomplete conversion for retry when it is absent. The converter refuses unrelated Gradle roots. It keeps Maven support while a conversion is postponed. The JDK 17 toolchain choice costs no Java-8-only host requirement while `options.release` retains old-SDK bytecode compatibility.
 
 ### Unexpected Problems and Discoveries
 
-To be completed from `Surprises & Discoveries`.
+SDK 7.3.0 could not be resolved from the configured Maven repository during an exploratory package run. More importantly, a 7.2.2 generated build failed when its toolchain was set to Java 8 because the host had no JDK 8; that directly motivated the renderer correction. A successful Linux ARM package disproved the earlier deployment-layout concern.
 
 ### Validation and Measurable Results
 
-To be completed with exact commands and observed results only.
+Observed results: `npm test` passed with 20 tests; governance validation passed; its Python regression suite passed 17 tests; `npm audit --audit-level=low` reported 0 vulnerabilities. `../totalcross-gradle-plugin` completed `./gradlew clean test publishToMavenLocal --console=plain` with 15 tasks. The clean converted fixture completed `./gradlew clean totalcrossPackage --console=plain` and wrote `MigrationDemo`, `MigrationDemo.tcz`, runtime `.tcz` files, and `libtcvm.so` beneath `build/totalcross/install/linux_arm`.
 
 ### Useful Evidence and Examples
 
-To be completed with concise references to tests, fixtures, logs, generated projects, commits, issues, or pull requests.
+Useful evidence includes `src/test/suite/migration-classifier.test.ts`, `maven-project.test.ts`, `migration-reminder.test.ts`, and `convert-project.test.ts`; the conversion commits beginning at `0443e77`; and the temporary validation archive `/private/tmp/totalcross-migration.vsix`. The generated fixture at `/private/tmp/totalcross-migration-e2e-final` contained `pom.xml.maven-backup`, Gradle Wrapper files, and the successful Linux ARM output during validation.
 
 ### Limitations, Remaining Work, and Open Questions
 
-To be completed honestly. At minimum, reassess whether remote publication of the Gradle plugin, Kotlin DSL support, multi-module Maven projects, and multi-root notification sequencing remain limitations.
+The Gradle plugin remains unpublished remotely and must be installed with `publishToMavenLocal`. Migration emits only Groovy DSL, supports one root Maven project rather than complete multi-module Maven model building, and shows at most one prompt per activation in a multi-root workspace. The exact visual notification was not manually clicked in an interactive Extension Development Host during this non-interactive run; action routing and timing are covered by automated tests. SDK 7.3.0 availability at the configured Maven repository remains unverified for packaging.
 
 ### Possible Article Angles
 
-To be completed with technically honest, problem-oriented article ideas.
+- For VS Code extension maintainers: "A safe build-system migration prompt without breaking existing workspaces" — reminder persistence and transaction boundaries.
+- For Gradle plugin authors: "Migrating a Maven POM without pretending to implement Maven" — constrained property resolution and clear rejection paths.
+- For Java build engineers: "Compile legacy bytecode with a modern JDK" — JDK 17 toolchains plus Java 8 release targets.
 
 ### Suggested Narrative
 
-To be completed as an evidence-based outline rather than a finished article.
+Start with the cost of forcing legacy workspaces to migrate. Explain root-only classification and the 24-hour opt-out. Describe extracting a small POM model, rendering a marked Gradle build, and delaying the POM rename until Wrapper validation. Cover the JDK 8 toolchain discovery, the JDK 17/release-8 correction, the local plugin publication proof, Linux ARM output evidence, and the remaining remote-publication and multi-module limits.
 
 ### Claims Requiring Human Review
 
-To be completed. Normal editorial and technical review is required even if no special claims are identified.
+The local plugin version, local Maven publication, and observed fixture output should receive normal technical review before publication. The configured repository's lack of SDK 7.3.0 during this run should not be generalized without separate verification. No other special claims were identified.
 
 ## Context and Orientation
 
@@ -756,4 +768,4 @@ Keep VS Code UI calls in the coordinator and command layer. Keep classification,
 
 Initial version created on 2026-07-16. This plan adds a one-day English-language migration recommendation and a safe assisted conversion path from legacy TotalCross Maven projects to the unpublished TotalCross Gradle plugin resolved through Maven Local.
 
-Revision 2026-07-16: recorded the checked-out Gradle support and local plugin facts, then completed the classifier, reminder, UI routing, Maven-model, Gradle-rendering, transactional-conversion, and packaging-alignment milestones with deterministic tests.
+Revision 2026-07-16: completed all milestones, corrected legacy-SDK toolchain rendering from end-to-end evidence, confirmed Gradle Linux ARM deployment output, and finalized validation and the editorial report.
