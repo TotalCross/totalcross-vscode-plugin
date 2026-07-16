@@ -5,7 +5,7 @@
 
 import * as vscode from 'vscode';
 import * as path from 'path';
-import {detectProjectLayout, resolveGradleApplicationName} from './project-layout';
+import {detectProjectLayout} from './project-layout';
 
 const NodeSsh = require('node-ssh');
 const validators = require('./validators/deployer');
@@ -48,8 +48,16 @@ async function deployProject(): Promise<DeploymentResult> {
     }
     const root = workspaceFolders[0].uri.fsPath;
     const layout = await detectProjectLayout(root, process.platform);
+    if (layout && layout.buildTool === 'mixed') {
+        vscode.window.showErrorMessage('This project contains both Maven and Gradle build files. Complete or select the migration before deploying.');
+        return {success: false};
+    }
     if (!layout) {
         vscode.window.showErrorMessage('No supported TotalCross project found. Expected a Gradle wrapper and build file, or pom.xml.');
+        return {success: false};
+    }
+    if (layout.buildTool === 'gradle') {
+        vscode.window.showErrorMessage('Deployment of Gradle TotalCross output is not supported yet because the Gradle plugin produces a .tcz package under build/totalcross, not the Linux ARM install directory required by the SSH deployer.');
         return {success: false};
     }
     if (!(await fs.pathExists(layout.linuxArmInstallDirectory))) {
@@ -58,16 +66,7 @@ async function deployProject(): Promise<DeploymentResult> {
     }
 
     const fallbackName = path.basename(root);
-    let applicationName: string;
-    if (layout.buildTool === 'gradle') {
-        const resolution = await resolveGradleApplicationName(root, fallbackName);
-        applicationName = resolution.name;
-        if (resolution.warning) {
-            vscode.window.showWarningMessage(resolution.warning);
-        }
-    } else {
-        applicationName = mavenApplicationName(await readPom(path.join(root, 'pom.xml')), fallbackName);
-    }
+    const applicationName = mavenApplicationName(await readPom(path.join(root, 'pom.xml')), fallbackName);
 
     const username = await vscode.window.showInputBox({prompt: 'ssh user', validateInput: validators.user});
     if (!username) { return {success: false}; }

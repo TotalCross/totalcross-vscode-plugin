@@ -10,5 +10,5 @@ export function packageCommand(buildTool: BuildTool, platform: NodeJS.Platform):
     if (buildTool === 'maven') {
         return 'mvn package';
     }
-    return platform === 'win32' ? 'gradlew.bat totalcrossPackage' : './gradlew totalcrossPackage';
+    return platform === 'win32' ? 'gradlew.bat totalcrossPackage --console=plain' : './gradlew totalcrossPackage --console=plain';
 }
