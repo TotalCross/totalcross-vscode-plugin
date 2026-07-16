@@ -16,6 +16,10 @@
 		"Other"
 	],
 	"activationEvents": [
+		"workspaceContains:build.gradle",
+		"workspaceContains:build.gradle.kts",
+		"workspaceContains:settings.gradle",
+		"workspaceContains:settings.gradle.kts",
 		"workspaceContains:pom.xml",
 		"onCommand:extension.login",
 		"onCommand:extension.register",
@@ -43,7 +47,17 @@
 				"command": "extension.deployAndRun",
 				"title": "TotalCross: Deploy&Run"
 			}
-		]
+		],
+		"configuration": {
+			"title": "TotalCross",
+			"properties": {
+				"totalcross.gradlePluginVersion": {
+					"type": "string",
+					"default": "0.1.0-SNAPSHOT",
+					"description": "Version of com.totalcross.application used in new projects. An unpublished version must first be installed with publishToMavenLocal."
+				}
+			}
+		}
 	},
 	"scripts": {
 		"vscode:prepublish": "npm run compile",
@@ -71,7 +85,6 @@
 		"fs-extra": "^8.1.0",
 		"jsonfile": "^6.0.1",
 		"node-ssh": "^13.2.1",
-		"replace-in-file": "^4.2.0",
 		"xml-js": "^1.6.11"
 	},
 	"overrides": {

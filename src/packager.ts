@@ -4,37 +4,23 @@
  */
 
 import * as vscode from 'vscode';
-var output = vscode.window.createTerminal("TotalCross Packager");
+import {detectProjectLayout} from './project-layout';
 
-exports.package = async function () {
-    return new Promise((resolve, reject) => {
-        // Display a message box to the user
-        var exec = require('child_process').exec, child;
-        let workspaceFolders = vscode.workspace.workspaceFolders;
-        if(!workspaceFolders) {
-            vscode.window.showErrorMessage("TotalCross project not found in this vscode instance.");
+export async function packageProject(): Promise<void> {
+    const workspaceFolders = vscode.workspace.workspaceFolders;
+    if (!workspaceFolders) {
+        vscode.window.showErrorMessage('TotalCross project not found in this VS Code instance.');
         return;
-        }
-        let folder = workspaceFolders[0].uri.fsPath;
-        if(process.platform === 'win32') {
-            folder = "/d " + folder;
-        }
-        output.show();        
-        output.sendText("mvn package");    
-        // child = exec(`cd ${folder} && mvn package`);		
-        // child.stdout.on('data', function(data: string) {
-        //     output.sendText(`echo ${data}`, false);
-        // });
-        // child.on('close', (code: number) => {
-        //     if(code === 0){
-        //         resolve(code);
-        //     }
-        //     else {
-        //         reject(code);
-        //     }
-        // });
-    });    
-};
-/**
- * Executes mvn package
- */
+    }
+    const layout = await detectProjectLayout(workspaceFolders[0].uri.fsPath, process.platform);
+    if (!layout) {
+        vscode.window.showErrorMessage('No supported TotalCross project found. Expected a Gradle wrapper and build file, or pom.xml.');
+        return;
+    }
+    const terminal = vscode.window.createTerminal({
+        name: `TotalCross Packager (${layout.buildTool})`,
+        cwd: layout.root
+    });
+    terminal.show();
+    terminal.sendText(layout.packageCommand, true);
+}
