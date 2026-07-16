@@ -24,8 +24,8 @@ The feature is visible when a legacy TotalCross Maven project is opened in an Ex
 - [x] (2026-07-16 13:47Z) Inspected the checked-out extension, existing Gradle generator/layout work, test suite, package exclusions, and sibling `totalcross-gradle-plugin` repository.
 - [x] (2026-07-16 13:48Z) Added pure root-level Maven-only TotalCross classification with invalid-POM containment.
 - [x] (2026-07-16 13:48Z) Added per-workspace reminder state with an exact 24-hour delay and tests passing fixed timestamps.
-- [ ] Add the English migration notification with the exact `Convert Now` and `Remind Me Tomorrow` actions.
-- [ ] Add an explicit `extension.convertMavenProjectToGradle` command and register it in `package.json`.
+- [x] (2026-07-16 13:50Z) Added the English activation-time migration notification with the exact two actions and dismissal postponement semantics.
+- [x] (2026-07-16 13:50Z) Registered the explicit `extension.convertMavenProjectToGradle` command and its activation event; its transaction is implemented in the conversion milestone.
 - [ ] Implement robust extraction of Gradle-relevant values from a TotalCross `pom.xml`.
 - [ ] Add reusable Gradle templates and Gradle Wrapper resources.
 - [ ] Implement safe, idempotent Maven-to-Gradle conversion with backup and recovery behavior.
@@ -88,6 +88,8 @@ Record unexpected behavior, compatibility constraints, parser edge cases, VS Cod
 ## Outcomes & Retrospective
 
 The first milestone is complete: `src/migration/project-classifier.ts` recognizes only root TotalCross Maven POMs, and `src/migration/reminder-state.ts` persists an exact per-folder 24-hour deadline. `npm run compile` and `npm test` passed with 12 tests. Notification UI, conversion, packaging alignment, and end-to-end publication validation remain.
+
+The second milestone is complete: `src/migration/migration-reminder.ts` presents the requested English prompt only once per activation and routes `Convert Now` using the selected folder URI. `package.json` exposes the retryable command. `npm run compile` and `npm test` passed with 14 tests.
 
 ## Editorial Report
 
@@ -748,4 +750,4 @@ Keep VS Code UI calls in the coordinator and command layer. Keep classification,
 
 Initial version created on 2026-07-16. This plan adds a one-day English-language migration recommendation and a safe assisted conversion path from legacy TotalCross Maven projects to the unpublished TotalCross Gradle plugin resolved through Maven Local.
 
-Revision 2026-07-16: recorded the checked-out Gradle support and local plugin facts, then completed the classification and reminder-state milestone with deterministic tests.
+Revision 2026-07-16: recorded the checked-out Gradle support and local plugin facts, then completed the classification, reminder-state, and notification-routing milestones with deterministic tests.

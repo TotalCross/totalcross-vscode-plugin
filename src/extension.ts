@@ -10,11 +10,14 @@ import {createNewProject} from './creator';
 import {deploy, deployAndRun} from './deployer';
 import {packageProject} from './packager';
 import {ConfigChecker} from './config-checker';
+import {showMigrationReminderIfNeeded} from './migration/migration-reminder';
+import {convertMavenProjectToGradle} from './migration/convert-project';
 
 // this method is called when your extension is activated
 // your extension is activated the very first time the command is executed
 export function activate(context: vscode.ExtensionContext) {
 	new ConfigChecker().checkConfigFile();
+	showMigrationReminderIfNeeded(context).catch((error) => console.error('Unable to show TotalCross migration reminder:', error));
 	/**
 	 * Create new Project
 	 */
@@ -39,6 +42,17 @@ export function activate(context: vscode.ExtensionContext) {
 	 * Deploy and Run
 	 */
 	disposable = vscode.commands.registerCommand('extension.deployAndRun', deployAndRun);
+	context.subscriptions.push(disposable);
+
+	/** Convert a specifically selected legacy workspace folder, including command-palette retries. */
+	disposable = vscode.commands.registerCommand('extension.convertMavenProjectToGradle', async (uri?: vscode.Uri) => {
+		const folder = uri ? vscode.workspace.getWorkspaceFolder(uri) : (vscode.workspace.workspaceFolders || [])[0];
+		if (!folder) {
+			vscode.window.showErrorMessage('TotalCross project not found in this VS Code instance.');
+			return;
+		}
+		await convertMavenProjectToGradle(context, folder);
+	});
 	context.subscriptions.push(disposable);
 
 }
