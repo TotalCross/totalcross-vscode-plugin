@@ -26,6 +26,8 @@ suite('Maven to Gradle project model', () => {
             const rendered = renderGradleProject(project, '0.1.0-SNAPSHOT');
             const build = String(rendered.files.get('build.gradle'));
             assert.ok(build.includes("allowInsecureProtocol = true"));
+            assert.ok(build.includes('languageVersion = JavaLanguageVersion.of(17)'));
+            assert.ok(build.includes('options.release = 17'));
             assert.ok(build.includes("activationKey = providers.gradleProperty('totalcrossActivationKey').orNull"));
             assert.equal(build.includes('secret'), false);
             assert.equal(String(rendered.files.get('.totalcross/project.json')).includes('secret'), false);
