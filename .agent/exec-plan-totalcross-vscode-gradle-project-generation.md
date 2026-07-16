@@ -18,9 +18,9 @@ A human can see the feature working by generating a project, opening the generat
 - [x] (2026-07-16 02:10Z) Added focused extension-host tests for template rendering, SDK Java-release selection, project layout, command construction, and Gradle application-name discovery; `npm test` passed with 10 tests.
 - [x] (2026-07-16 02:10Z) Replaced Maven generation resources with Gradle build, settings, properties, ignore-file, Java source, and Gradle 9.6.1 wrapper resources, including the wrapper JAR and Windows script.
 - [x] (2026-07-16 02:10Z) Refactored `src/creator.ts` to render the Gradle template tree synchronously, copy binary wrapper files unchanged, reject non-empty destinations, and stop downloading Maven-plugin metadata.
-- [ ] Update extension activation and configuration so Gradle TotalCross projects are recognized and the local Gradle plugin version is explicit and maintainable.
-- [ ] Update `src/packager.ts` to execute the generated Gradle Wrapper from the selected workspace, while retaining a Maven fallback for pre-existing Maven projects.
-- [ ] Update `src/deployer.ts` to resolve Gradle package output and project identity, while retaining the legacy Maven layout as a compatibility path.
+- [x] (2026-07-16 02:12Z) Updated extension activation and configuration so Gradle workspaces are recognized and `totalcross.gradlePluginVersion` defaults to `0.1.0-SNAPSHOT` with its Maven Local requirement documented.
+- [x] (2026-07-16 02:12Z) Updated `src/packager.ts` to create a fresh terminal rooted at the selected workspace and execute the Gradle Wrapper or the Maven compatibility command selected by project detection.
+- [x] (2026-07-16 02:12Z) Updated `src/deployer.ts` to select the Gradle or Maven Linux ARM output directory, resolve Gradle application names without executing build scripts, verify local output before SSH, and retain Maven POM parsing only for Maven workspaces.
 - [ ] Publish `totalcross-gradle-plugin` to Maven Local and prove a freshly generated project resolves and executes `totalcrossPackage` without an adjacent plugin checkout.
 - [ ] Validate generated projects on a POSIX host and, where a Windows host is available, verify `gradlew.bat` and Windows command construction.
 - [ ] Update `README.md`, `CHANGELOG.md`, screenshots or recordings where practical, and any requirement text that still presents Maven as mandatory.
@@ -82,9 +82,13 @@ Add new observations here as implementation reveals actual output trees, wrapper
   Rationale: the same value was already committed in the Maven generator and its source template. It is therefore treated as the extension's existing public development key rather than a newly introduced secret, while avoiding embedding it directly in `build.gradle`.
   Date/Author: 2026-07-16 / OpenAI
 
+- Decision: retain the terminal-driven package command.
+  Rationale: this preserves the extension's visible build output and user control while the pure layout helper makes the selected command testable. Deploy remains a separate command because a terminal invocation does not provide a completion result that deploy could safely await.
+  Date/Author: 2026-07-16 / OpenAI
+
 ## Outcomes & Retrospective
 
-The generator now produces a self-contained Gradle consumer project in an empty selected directory. The output has Groovy build/settings files, a Gradle 9.6.1 wrapper, the application source at the group-derived Java path, a configured plugin snapshot version, and no Maven POM. Rendering and file copying are awaited, unlike the previous asynchronous per-token replacement calls. `npm run compile` and `npm test` passed after the change; the extension-host test suite reported 10 passing tests. Package/deploy command changes, VSIX inspection, independently resolved plugin execution, and documentation remain to be completed.
+The generator now produces a self-contained Gradle consumer project in an empty selected directory. The output has Groovy build/settings files, a Gradle 9.6.1 wrapper, the application source at the group-derived Java path, a configured plugin snapshot version, and no Maven POM. Rendering and file copying are awaited, unlike the previous asynchronous per-token replacement calls. Package and deploy now detect Gradle first and preserve a Maven-only fallback; deployment verifies Linux ARM output before opening an SSH connection. `npm run compile` and `npm test` passed after the generator change; the extension-host test suite reported 10 passing tests. The command changes, VSIX inspection, independently resolved plugin execution, and documentation remain to be validated.
 
 ## Editorial Report
 

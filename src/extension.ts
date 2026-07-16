@@ -6,9 +6,9 @@
 // The module 'vscode' contains the VS Code extensibility API
 // Import the module and reference it with the alias vscode in your code below
 import * as vscode from 'vscode';
-var Packager = require('./packager');
-var Deployer = require('./deployer');
-var Creator = require('./creator');
+import {createNewProject} from './creator';
+import {deploy, deployAndRun} from './deployer';
+import {packageProject} from './packager';
 import {ConfigChecker} from './config-checker';
 
 // this method is called when your extension is activated
@@ -19,26 +19,26 @@ export function activate(context: vscode.ExtensionContext) {
 	 * Create new Project
 	 */
 	let disposable = vscode.commands.registerCommand('extension.createNewProject', function() {
-		Creator.createNewProject(context);
+		createNewProject(context);
 	});
 	context.subscriptions.push(disposable);
 	
 	/**
 	 * Package
 	 */
-	disposable = vscode.commands.registerCommand('extension.package', Packager.package);
+	disposable = vscode.commands.registerCommand('extension.package', packageProject);
 	context.subscriptions.push(disposable);
 
 	/**
 	 * Deploy 
 	 */
-	disposable = vscode.commands.registerCommand('extension.deploy', Deployer.deploy);
+	disposable = vscode.commands.registerCommand('extension.deploy', deploy);
 	context.subscriptions.push(disposable);
 
 	/**
 	 * Deploy and Run
 	 */
-	disposable = vscode.commands.registerCommand('extension.deployAndRun', Deployer.deployAndRun);
+	disposable = vscode.commands.registerCommand('extension.deployAndRun', deployAndRun);
 	context.subscriptions.push(disposable);
 
 }

@@ -36,6 +36,18 @@ suite('Project layout', () => {
         }
     });
 
+    test('recognizes a Maven-only workspace for compatibility', async () => {
+        const root = await fs.mkdtemp(path.join(os.tmpdir(), 'totalcross-vscode-maven-layout-'));
+        try {
+            await fs.writeFile(path.join(root, 'pom.xml'), '<project/>');
+            const layout = await detectProjectLayout(root, 'darwin');
+            assert.ok(layout);
+            assert.equal(layout && layout.buildTool, 'maven');
+        } finally {
+            await fs.rmdir(root, {recursive: true});
+        }
+    });
+
     test('uses only simple generated Gradle assignments for deployment identity', async () => {
         assert.equal(applicationNameFromGradle("totalcross {\n applicationName = 'Demo'\n}"), 'Demo');
         assert.equal(projectNameFromSettings("rootProject.name = 'Sample'"), 'Sample');
