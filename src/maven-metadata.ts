@@ -9,7 +9,6 @@ const fs = require('fs-extra');
 const xmlParser = require('xml-js');
 
 const TOTALCROSS_SDK_METADATA_URL = 'https://maven.totalcross.com/artifactory/repo1/com/totalcross/totalcross-sdk/maven-metadata.xml';
-const TOTALCROSS_MAVEN_PLUGIN_METADATA_URL = 'https://maven.totalcross.com/artifactory/repo1/com/totalcross/totalcross-maven-plugin/maven-metadata.xml';
 
 export function metadataVersions(metadata: string): string[] {
     const document = JSON.parse(xmlParser.xml2json(metadata, {compact: true}));
@@ -50,8 +49,4 @@ export async function latestTotalCrossSdkVersions(cachedMetadataPath: string): P
     } catch (_) {
         return latestVersionForEachMajor(metadataVersions(await fs.readFile(cachedMetadataPath, 'utf8')));
     }
-}
-
-export async function latestMavenPluginVersion(): Promise<string> {
-    return metadataVersions(await downloadText(TOTALCROSS_MAVEN_PLUGIN_METADATA_URL))[0];
 }

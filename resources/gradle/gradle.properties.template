@@ -1,0 +1,4 @@
+# SPDX-FileCopyrightText: 2026 Amalgam Solucoes em TI Ltda.
+# SPDX-License-Identifier: Apache-2.0
+
+totalcrossActivationKey=${'activation_key'}
