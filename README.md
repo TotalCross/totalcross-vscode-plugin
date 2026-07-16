@@ -6,8 +6,7 @@ currently intended for Linux ARM targets reached over SSH.
 
 ## Requirements
 
-- Java JDK 11
-- Maven 3.6.2
+- Java JDK 17
 - Node.js and npm compatible with this extension's dependencies
 
 ## Use
@@ -20,7 +19,29 @@ commands:
 - `TotalCross: Deploy`
 - `TotalCross: Deploy&Run`
 
-Packaging places the target program in `target/install/<platform>`.
+New projects use the Gradle Wrapper included in the generated project, so a
+separate Gradle or Maven installation is not required. Package a project with
+`TotalCross: Package` or from the project directory with:
+
+    ./gradlew totalcrossPackage
+
+On Windows, use `gradlew.bat totalcrossPackage`. Generated output is rooted at
+`build/totalcross`; Linux ARM packages are uploaded from
+`build/totalcross/install/linux_arm`. Existing Maven-only projects remain
+supported and continue to package with `mvn package` and use `target/install`.
+
+## Using the unpublished Gradle plugin locally
+
+Before creating a project with the default `0.1.0-SNAPSHOT` plugin version,
+publish the plugin checkout to Maven Local:
+
+    ./gradlew clean test publishToMavenLocal --console=plain
+
+Run that command from `totalcross-gradle-plugin`. Generated `settings.gradle`
+files search Maven Local before public plugin repositories, so Gradle can find
+the local plugin marker and implementation. The
+`totalcross.gradlePluginVersion` VS Code setting must match the version that
+was published locally.
 
 ## Development
 

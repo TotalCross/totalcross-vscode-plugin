@@ -61,6 +61,10 @@ class RepositoryGovernanceTest(unittest.TestCase):
         errors = self.errors_for("src/maven-metadata.ts", f"/*\n * {governance.AMALGAM_COPYRIGHT}\n * {governance.APACHE}\n */\n")
         self.assertEqual([], errors)
 
+    def test_new_gradle_template_uses_amalgam_header(self):
+        errors = self.errors_for("resources/gradle/build.gradle.template", f"/*\n * {governance.AMALGAM_COPYRIGHT}\n * {governance.APACHE}\n */\n")
+        self.assertEqual([], errors)
+
     def test_amalgam_mit_header_is_rejected(self):
         errors = self.errors_for("tools/check-repository-governance.py", f"# {governance.AMALGAM_COPYRIGHT}\n# {governance.MIT}\n")
         self.assertIn("tools/check-repository-governance.py: missing or misplaced required amalgam copyright/SPDX header", errors)
