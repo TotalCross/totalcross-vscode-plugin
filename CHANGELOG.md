@@ -6,6 +6,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Upcoming changes
 - Live UI preview
+- New projects now use the Gradle Wrapper and `com.totalcross.application`.
+  The default unpublished plugin version must be installed with
+  `publishToMavenLocal`; existing Maven-only workspaces remain supported for
+  packaging and deployment.
 
 ## [0.0.15] - 2021-04-27
 ### Changed

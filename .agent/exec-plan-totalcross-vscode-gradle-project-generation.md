@@ -21,10 +21,10 @@ A human can see the feature working by generating a project, opening the generat
 - [x] (2026-07-16 02:12Z) Updated extension activation and configuration so Gradle workspaces are recognized and `totalcross.gradlePluginVersion` defaults to `0.1.0-SNAPSHOT` with its Maven Local requirement documented.
 - [x] (2026-07-16 02:12Z) Updated `src/packager.ts` to create a fresh terminal rooted at the selected workspace and execute the Gradle Wrapper or the Maven compatibility command selected by project detection.
 - [x] (2026-07-16 02:12Z) Updated `src/deployer.ts` to select the Gradle or Maven Linux ARM output directory, resolve Gradle application names without executing build scripts, verify local output before SSH, and retain Maven POM parsing only for Maven workspaces.
-- [ ] Publish `totalcross-gradle-plugin` to Maven Local and prove a freshly generated project resolves and executes `totalcrossPackage` without an adjacent plugin checkout.
-- [ ] Validate generated projects on a POSIX host and, where a Windows host is available, verify `gradlew.bat` and Windows command construction.
-- [ ] Update `README.md`, `CHANGELOG.md`, screenshots or recordings where practical, and any requirement text that still presents Maven as mandatory.
-- [ ] Reconcile all implementation evidence into `Outcomes & Retrospective` and finalize the `Editorial Report`.
+- [x] (2026-07-16 02:12Z) Published `totalcross-gradle-plugin` to Maven Local; an independent generated project listed and executed `totalcrossPackage` without a composite build.
+- [x] (2026-07-16 02:13Z) Validated the generated wrapper on macOS/POSIX, including `--offline` after caching. Windows command construction and `gradlew.bat` inclusion are covered by tests and VSIX inspection; a Windows host was not available.
+- [x] (2026-07-16 02:19Z) Updated `README.md` and `CHANGELOG.md`, packaged a VSIX, and verified its Gradle wrapper resources and source/test exclusions.
+- [x] (2026-07-16 02:22Z) Ran final compile, extension-host tests, audit, governance validation, and governance tests; reconciled this report with observed evidence.
 
 ## Surprises & Discoveries
 
@@ -45,6 +45,15 @@ A human can see the feature working by generating a project, opening the generat
 
 - Observation: the supporting plugin checkout has Gradle 9.6.1 wrapper files but no committed `gradlew.bat`.
   Evidence: `ls ../totalcross-gradle-plugin/gradlew.bat` returned “No such file or directory”; a clean temporary Gradle basic build generated the complete 9.6.1 wrapper, including `gradlew.bat` and `gradle-wrapper.jar`.
+
+- Observation: repository governance originally classified all new `src/` and `resources/` files as historical MIT work.
+  Evidence: `npm run validate:governance` rejected the new Apache-2.0 Gradle templates and helper modules despite the repository instruction that new first-party source uses Apache-2.0.
+
+- Observation: the actual Linux ARM output exactly matches the intended Gradle deploy path.
+  Evidence: `./gradlew clean totalcrossPackage --console=plain` created `build/totalcross/install/linux_arm/GradleSample`, its `.tcz` files, and `libtcvm.so` for an independently generated SDK 7.2.2 project.
+
+- Observation: the generated project packages offline once Gradle, the plugin, SDK, and JDK are cached.
+  Evidence: `./gradlew totalcrossPackage --offline --console=plain` reported `BUILD SUCCESSFUL` with the task up to date.
 
 Add new observations here as implementation reveals actual output trees, wrapper packaging behavior, platform differences, or compatibility constraints.
 
@@ -86,9 +95,13 @@ Add new observations here as implementation reveals actual output trees, wrapper
   Rationale: this preserves the extension's visible build output and user control while the pure layout helper makes the selected command testable. Deploy remains a separate command because a terminal invocation does not provide a completion result that deploy could safely await.
   Date/Author: 2026-07-16 / OpenAI
 
+- Decision: classify the new Gradle templates and helper modules as Amalgam Apache-2.0 work, while excluding unmodified Gradle Wrapper artifacts from first-party header checks.
+  Rationale: this preserves the MIT notice on the relocated historical sample Java source, gives newly authored files the repository-required license, and leaves generated third-party wrapper notices intact.
+  Date/Author: 2026-07-16 / OpenAI
+
 ## Outcomes & Retrospective
 
-The generator now produces a self-contained Gradle consumer project in an empty selected directory. The output has Groovy build/settings files, a Gradle 9.6.1 wrapper, the application source at the group-derived Java path, a configured plugin snapshot version, and no Maven POM. Rendering and file copying are awaited, unlike the previous asynchronous per-token replacement calls. Package and deploy now detect Gradle first and preserve a Maven-only fallback; deployment verifies Linux ARM output before opening an SSH connection. `npm run compile` and `npm test` passed after the generator change; the extension-host test suite reported 10 passing tests. The command changes, VSIX inspection, independently resolved plugin execution, and documentation remain to be validated.
+The generator now produces a self-contained Gradle consumer project in an empty selected directory. The output has Groovy build/settings files, a Gradle 9.6.1 wrapper, the application source at the group-derived Java path, a configured plugin snapshot version, and no Maven POM. Rendering and file copying are awaited, unlike the previous asynchronous per-token replacement calls. Package and deploy now detect Gradle first and preserve a Maven-only fallback; deployment verifies Linux ARM output before opening SSH. An independently generated project resolved the locally published plugin, ran `totalcrossPackage`, and produced Linux ARM files at the path used by deploy. The VSIX also generated a project that listed the task. Final validation passed: compilation, 10 extension-host tests, audit, governance checks, and governance tests.
 
 ## Editorial Report
 
@@ -96,35 +109,43 @@ This section is mandatory at completion. Keep it factual, evidence-based, and sy
 
 ### Editorial Summary
 
-To be completed from implementation evidence. Explain why the VS Code extension's Maven-only generator and commands prevented use of the new Gradle plugin, and describe the final developer workflow that was actually delivered.
+The extension generated Maven projects and invoked Maven even though the supported new plugin is Gradle-based. This prevented a newly generated project from consuming `com.totalcross.application` through the normal plugin mechanism. The implementation now generates a portable Gradle project with its own wrapper and has the extension package and deploy Gradle projects first while retaining Maven behavior for old Maven-only workspaces.
+
+The delivered local-development workflow is to publish `totalcross-gradle-plugin` to Maven Local, create a project, and run `./gradlew totalcrossPackage`. The generated settings resolve the plugin marker from Maven Local, and successful output appears below `build/totalcross`.
 
 ### Original Plan versus Actual Outcome
 
-To be completed. State which planned Gradle templates, wrapper behavior, Maven compatibility paths, local-publication workflow, tests, and documentation were delivered, changed, deferred, or rejected.
+The Gradle templates, complete 9.6.1 wrapper, Maven Local resolution, SDK-aware Java target selection, Maven compatibility path, extension configuration, tests, documentation, and VSIX inspection were delivered as planned. The dead local Java runner was removed rather than carried into Gradle. The wrapper was generated from a clean temporary Gradle project because the plugin checkout did not contain `gradlew.bat`.
+
+The planned interactive `TotalCross: Package` observation was not recorded against a clean generated workspace: the available Extension Development Host was already opened on an unrelated dirty workspace. The command implementation is covered by focused tests, and the same wrapper task was observed from generated source and VSIX consumer projects. Windows execution and SSH transfer were not performed because no Windows or SSH target was available.
 
 ### What Changed
 
-To be completed with stable repository-relative paths. At minimum, reconcile changes around `src/creator.ts`, `src/packager.ts`, `src/deployer.ts`, `src/maven-metadata.ts` or its renamed replacement, `resources/`, `package.json`, tests, `README.md`, and `CHANGELOG.md`.
+`src/project-generator.ts`, `src/project-layout.ts`, and `src/build-command.ts` provide deterministic generation, layout detection, command selection, and safe Gradle identity parsing. `src/creator.ts` uses them and no longer downloads Maven-plugin metadata. `src/packager.ts` and `src/deployer.ts` select Gradle output and commands before Maven compatibility behavior.
+
+`resources/gradle/` contains the rendered Gradle scripts, historical Java sample, and wrapper. `package.json` adds Gradle activation events and `totalcross.gradlePluginVersion`; `.vscodeignore` keeps templates while excluding source and test material. `README.md`, `CHANGELOG.md`, and governance validation/tests were updated accordingly.
 
 ### Decisions and Trade-offs
 
-To be completed from the final `Decision Log`. Pay particular attention to Maven Local versus composite builds, wrapper bundling, compatibility with old Maven projects, plugin-version configuration, and any platform-specific command behavior.
+Maven Local was chosen over a composite build so generated projects remain independent of a sibling plugin checkout. Bundling the wrapper makes package commands reproducible and lets the extension select `./gradlew totalcrossPackage` on POSIX or `gradlew.bat totalcrossPackage` on Windows. Maven remains only as a detection-based compatibility branch. The snapshot plugin version is an extension setting so local publication and future public versions can be coordinated without paths embedded in projects.
 
 ### Unexpected Problems and Discoveries
 
-To be completed from `Surprises & Discoveries`, with concise evidence. Include wrapper permission or VSIX packaging problems, actual Gradle output layout differences, plugin marker resolution failures, SDK/JDK compatibility findings, and Windows-specific behavior if observed.
+The plugin checkout lacked `gradlew.bat`, so a temporary Gradle 9.6.1 basic build supplied the verified Windows script and wrapper JAR. Governance initially rejected new Apache files because all `src/` and `resources/` paths were treated as historical; targeted classifications now distinguish the new first-party templates from unmodified third-party wrapper artifacts. The observed deployer output used the planned Linux ARM path. No Windows host was available.
 
 ### Validation and Measurable Results
 
-To be completed with exact commands and observed results only. Include extension compile/test results, generated file assertions, VSIX contents, local plugin publication, Gradle dependency resolution, `totalcrossPackage`, output paths, and platform coverage. State explicitly if no size or performance measurement was taken.
+Observed results: `./gradlew clean test publishToMavenLocal --console=plain` in `totalcross-gradle-plugin` succeeded with 15 actionable tasks and published the application marker under `com/totalcross/application/com.totalcross.application.gradle.plugin/0.1.0-SNAPSHOT/`. An independent consumer's `./gradlew tasks --console=plain` listed `totalcrossPackage`; `./gradlew clean totalcrossPackage --console=plain` succeeded and created Linux ARM and Linux ARM64 files under `build/totalcross/install/`.
+
+`npm run compile`, `npm test` (10 passing), `npm audit --audit-level=low`, `npm run validate:governance`, and `npm run test:governance` (17 tests) passed. `npx @vscode/vsce package --no-dependencies --out /tmp/totalcross-vscode-gradle-validation.vsix` produced a 38-file, 226.59 KB VSIX containing the wrapper JAR; a consumer generated from that VSIX listed `totalcrossPackage`. No performance measurement was taken.
 
 ### Useful Evidence and Examples
 
-To be completed. Point to focused tests, a generated sample project fixture, concise successful command output, the resulting `build/totalcross` tree, screenshots or recordings, and commits or pull requests created during execution.
+Focused coverage is in `src/test/suite/project-generator.test.ts` and `src/test/suite/project-layout.test.ts`. The independent generated sample was under `/tmp/totalcross-vscode-gradle-sample.F2e4VB`; its output tree included `build/totalcross/install/linux_arm/GradleSample`, `GradleSample.tcz`, `TCBase.tcz`, `TCFont.tcz`, `TCUI.tcz`, and `libtcvm.so`. The local marker and implementation artifacts were inspected under `~/.m2/repository/com/totalcross/`. Commits `3255075` and `3b4bf14` capture the generator and command work.
 
 ### Limitations, Remaining Work, and Open Questions
 
-To be completed. Likely topics include public publication of the Gradle plugin, migration or eventual removal of Maven compatibility, support for `build.gradle.kts`, richer platform selection, activation-key handling, and deploy support beyond Linux ARM. Include only limitations that remain in the final state.
+The plugin is still unpublished publicly, so default project creation requires a matching Maven Local publication. The generated DSL is Groovy only; Kotlin DSL detection exists for existing workspaces but no Kotlin template is generated. Maven compatibility remains and should be removed only deliberately. Windows wrapper execution, all target platforms, a clean interactive VS Code package invocation, and real SSH deployment were not observed in this run. The existing development activation key needs release-policy review before being promoted as a production recommendation.
 
 ### Possible Article Angles
 
@@ -132,15 +153,15 @@ To be completed. Likely topics include public publication of the Gradle plugin, 
 - For Gradle plugin authors: “Testing an unpublished Gradle plugin through Maven Local and a real generated consumer project,” focusing on marker artifacts and end-to-end validation.
 - For developer-tooling engineers: “Why generated projects should carry their own build wrapper,” focusing on reproducibility across VS Code, terminals, CI, and operating systems.
 
-Revise these angles after implementation so they reflect the strongest verified engineering result.
+The strongest verified angle is the independent Maven Local consumer: it proves plugin-marker resolution, wrapper portability, and real `tc.Deploy` output without a composite build.
 
 ### Suggested Narrative
 
-Begin with the mismatch between a Maven-only VS Code workflow and the new TotalCross Gradle plugin. Explain the constraints: the plugin is unpublished, generated projects must be portable, existing Maven users should not be broken, and the extension runs on Windows, macOS, and Linux. Compare a composite build with Maven Local, explain why Maven Local was selected for independent generated projects, show the new templates and wrapper, describe the command and deploy-layout migration, present end-to-end evidence, then close with current limitations and the path to public plugin publication.
+Start with the Maven/Gradle workflow mismatch. Explain the constraint that the plugin is unpublished but generated projects must stay movable. Contrast composite builds with Maven Local, then show how plugin markers and a bundled wrapper make a separate consumer work. Cover Gradle-first command/layout detection, present the independently generated Linux ARM output and VSIX evidence, and close with the unverified Windows, SSH, and public-publication work.
 
 ### Claims Requiring Human Review
 
-Any statement that the Gradle plugin is ready for general public use, that all TotalCross target platforms were successfully packaged, or that Maven compatibility can be removed requires maintainer review and evidence beyond a single generated sample. Activation-key examples and repository URLs also require security and release-policy review before public documentation is published.
+Claims that the plugin is ready for public use, that all TotalCross target platforms work, that Windows packaging was validated, or that Maven compatibility can be removed require maintainer review. The activation key and any public documentation of plugin repositories require normal security and release-policy review.
 
 ## Context and Orientation
 

@@ -1,7 +1,13 @@
 .vscode/**
 .vscode-test/**
+.agent/**
+.github/**
 out/test/**
 src/**
+tests/**
+tools/**
+AGENTS.md
+CONTRIBUTING.md
 .gitignore
 vsc-extension-quickstart.md
 **/tsconfig.json

@@ -23,6 +23,15 @@ HISTORICAL_EXCLUSIONS = {"resources/maven-metadata.xml"}
 AMALGAM_C_PATHS = {
     "src/maven-metadata.ts",
     "src/test/suite/maven-metadata.test.ts",
+    "src/build-command.ts",
+    "src/project-generator.ts",
+    "src/project-layout.ts",
+    "src/test/suite/project-generator.test.ts",
+    "src/test/suite/project-layout.test.ts",
+    "resources/gradle/.gitignore",
+    "resources/gradle/build.gradle.template",
+    "resources/gradle/gradle.properties.template",
+    "resources/gradle/settings.gradle.template",
     "tools/check-repository-governance.py",
     "tests/test_repository_governance.py",
 }
@@ -36,6 +45,10 @@ EXCLUDED_PREFIXES = (".git/", "out/", "node_modules/", "tests/fixtures/")
 EXCLUDED_PATHS = {
     ".github/modernize/java-upgrade/.gitignore",
     "vsc-extension-quickstart.md",
+    "resources/gradle/gradle/wrapper/gradle-wrapper.jar",
+    "resources/gradle/gradle/wrapper/gradle-wrapper.properties",
+    "resources/gradle/gradlew",
+    "resources/gradle/gradlew.bat",
 }
 
 
