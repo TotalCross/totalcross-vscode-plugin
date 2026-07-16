@@ -26,7 +26,8 @@
 		"onCommand:extension.createNewProject",
 		"onCommand:extension.package",
 		"onCommand:extension.deploy",
-		"onCommand:extension.deployAndRun"
+		"onCommand:extension.deployAndRun",
+		"onCommand:extension.convertMavenProjectToGradle"
 	],
 	"main": "./out/extension.js",
 	"contributes": {
@@ -46,6 +47,10 @@
 			{
 				"command": "extension.deployAndRun",
 				"title": "TotalCross: Deploy&Run"
+			},
+			{
+				"command": "extension.convertMavenProjectToGradle",
+				"title": "TotalCross: Convert Maven Project to Gradle"
 			}
 		],
 		"configuration": {
