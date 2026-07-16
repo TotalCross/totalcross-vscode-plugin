@@ -28,7 +28,7 @@ The feature is visible when a legacy TotalCross Maven project is opened in an Ex
 - [x] (2026-07-16 13:50Z) Registered the explicit `extension.convertMavenProjectToGradle` command and its activation event; its transaction is implemented in the conversion milestone.
 - [x] (2026-07-16 13:52Z) Implemented normalized Maven extraction with parent fallbacks, simple properties, TotalCross configuration, and specific unsupported-model errors.
 - [x] (2026-07-16 13:52Z) Added a reusable Gradle renderer that packages the existing Gradle 9.6.1 Wrapper resources and writes non-secret migration metadata.
-- [ ] Implement safe, idempotent Maven-to-Gradle conversion with backup and recovery behavior.
+- [x] (2026-07-16 13:54Z) Implemented atomic Maven-to-Gradle conversion, post-validation POM backup, rollback, generated-build retry, and Maven-Local-missing retention behavior.
 - [ ] Update packaging and project recognition so converted Gradle projects use Gradle while existing Maven projects remain usable.
 - [ ] Add unit, migration-fixture, extension, and end-to-end validation.
 - [ ] Update user-facing documentation and changelog entries in English.
@@ -92,6 +92,8 @@ The first milestone is complete: `src/migration/project-classifier.ts` recognize
 The second milestone is complete: `src/migration/migration-reminder.ts` presents the requested English prompt only once per activation and routes `Convert Now` using the selected folder URI. `package.json` exposes the retryable command. `npm run compile` and `npm test` passed with 14 tests.
 
 The third and fourth milestones are complete: `src/migration/maven-project.ts` normalizes supported POM values, and `src/migration/gradle-renderer.ts` builds Groovy Gradle files, wrapper resources, and `.totalcross/project.json` in memory. The renderer draws the wrapper from the pre-existing packaged `resources/gradle` tree, whose version is Gradle 9.6.1. `npm run compile` and `npm test` passed with 16 tests.
+
+The fifth milestone is complete: `src/migration/convert-project.ts` writes generated files through sibling temporary paths, merges a pre-existing `gradle.properties` conservatively, validates with an argument-array Wrapper invocation, and renames the POM only after success. It preserves generated files and the original POM if Maven Local lacks the plugin, but restores ordinary failures. `npm run compile` and `npm test` passed with 18 tests before the final missing-local-plugin regression was added.
 
 ## Editorial Report
 
@@ -752,4 +754,4 @@ Keep VS Code UI calls in the coordinator and command layer. Keep classification,
 
 Initial version created on 2026-07-16. This plan adds a one-day English-language migration recommendation and a safe assisted conversion path from legacy TotalCross Maven projects to the unpublished TotalCross Gradle plugin resolved through Maven Local.
 
-Revision 2026-07-16: recorded the checked-out Gradle support and local plugin facts, then completed the classifier, reminder, UI routing, Maven-model, and Gradle-rendering milestones with deterministic tests.
+Revision 2026-07-16: recorded the checked-out Gradle support and local plugin facts, then completed the classifier, reminder, UI routing, Maven-model, Gradle-rendering, and transactional-conversion milestones with deterministic tests.
