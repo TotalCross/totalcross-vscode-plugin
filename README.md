@@ -1,3 +1,10 @@
+> [!IMPORTANT]
+> This project has moved to the
+> [`TotalCross/totalcross-tooling`](https://github.com/TotalCross/totalcross-tooling)
+> repository under [`vscode-extension/`](https://github.com/TotalCross/totalcross-tooling/tree/main/vscode-extension).
+> Development continues there. This repository is retained for historical
+> issues, pull requests, releases, and links and is intended to be archived.
+
 # TotalCross VS Code Extension
 
 This extension adds commands to Visual Studio Code for creating, packaging,
