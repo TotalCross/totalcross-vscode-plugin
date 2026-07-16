@@ -13,6 +13,10 @@ export async function packageProject(): Promise<void> {
         return;
     }
     const layout = await detectProjectLayout(workspaceFolders[0].uri.fsPath, process.platform);
+    if (layout && layout.buildTool === 'mixed') {
+        vscode.window.showErrorMessage('This project contains both Maven and Gradle build files. Complete or select the migration before packaging.');
+        return;
+    }
     if (!layout) {
         vscode.window.showErrorMessage('No supported TotalCross project found. Expected a Gradle wrapper and build file, or pom.xml.');
         return;

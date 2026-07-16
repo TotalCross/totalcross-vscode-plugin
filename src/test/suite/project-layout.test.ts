@@ -12,8 +12,8 @@ import {applicationNameFromGradle, detectProjectLayout, layoutFor, projectNameFr
 
 suite('Project layout', () => {
     test('selects Gradle wrapper commands by platform and preserves Maven compatibility', () => {
-        assert.equal(packageCommand('gradle', 'darwin'), './gradlew totalcrossPackage');
-        assert.equal(packageCommand('gradle', 'win32'), 'gradlew.bat totalcrossPackage');
+        assert.equal(packageCommand('gradle', 'darwin'), './gradlew totalcrossPackage --console=plain');
+        assert.equal(packageCommand('gradle', 'win32'), 'gradlew.bat totalcrossPackage --console=plain');
         assert.equal(packageCommand('maven', 'darwin'), 'mvn package');
         const gradle = layoutFor('gradle', '/project', 'linux');
         const maven = layoutFor('maven', '/project', 'linux');
@@ -21,7 +21,7 @@ suite('Project layout', () => {
         assert.equal(maven.linuxArmInstallDirectory, path.join('/project', 'target', 'install', 'linux_arm'));
     });
 
-    test('prefers Gradle when both layouts are present', async () => {
+    test('identifies a mixed root so callers do not guess a build system', async () => {
         const root = await fs.mkdtemp(path.join(os.tmpdir(), 'totalcross-vscode-layout-'));
         try {
             await Promise.all([
@@ -30,7 +30,7 @@ suite('Project layout', () => {
             ]);
             const layout = await detectProjectLayout(root, 'darwin');
             assert.ok(layout);
-            assert.equal(layout && layout.buildTool, 'gradle');
+            assert.equal(layout && layout.buildTool, 'mixed');
         } finally {
             await fs.rmdir(root, {recursive: true});
         }
@@ -55,6 +55,17 @@ suite('Project layout', () => {
         try {
             await fs.writeFile(path.join(root, 'settings.gradle'), "rootProject.name = 'Sample'");
             assert.deepEqual(await resolveGradleApplicationName(root, 'fallback'), {name: 'Sample'});
+        } finally {
+            await fs.rmdir(root, {recursive: true});
+        }
+    });
+
+    test('uses conversion metadata before parsing Gradle text', async () => {
+        const root = await fs.mkdtemp(path.join(os.tmpdir(), 'totalcross-vscode-metadata-name-'));
+        try {
+            await fs.mkdir(path.join(root, '.totalcross'));
+            await fs.writeFile(path.join(root, '.totalcross', 'project.json'), '{"applicationName":"Migrated App"}');
+            assert.deepEqual(await resolveGradleApplicationName(root, 'fallback'), {name: 'Migrated App'});
         } finally {
             await fs.rmdir(root, {recursive: true});
         }
